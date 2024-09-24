@@ -58,12 +58,6 @@ class CustomValidator extends BaseValidator {
       if (!Array.isArray(data.stac_extensions)) {
         data.stac_extensions = [];
       }
-      if (!isProcess) { // No schema available for processes
-        const url = `${GITHUB_SCHEMA_URI}/schemas/${type}/${level}.json`;
-        const file = `/home/fabian/dev/osc/metadata-testing/schemas/${type}/${level}.json`;
-        data.stac_extensions.push(url);
-        config.schemaMap[url] = file;
-      }
     }
 
     // Cache title to allow checks for consistent titles
