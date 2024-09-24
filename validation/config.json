@@ -1,0 +1,20 @@
+{
+  "lint": false,
+  "custom": "./validate.js",
+  "schemaMap": {
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/catalog.json": "../schemas/catalog.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/collection.json": "../schemas/collection.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/contacts.json": "../schemas/contacts.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/eo-missions/children.json": "../schemas/eo-missions/children.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/eo-missions/parent.json": "../schemas/eo-missions/parent.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/processes/parent.json": "../schemas/processes/parent.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/products/children.json": "../schemas/products/children.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/products/parent.json": "../schemas/products/parent.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/projects/children.json": "../schemas/projects/children.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/projects/parent.json": "../schemas/projects/parent.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/themes/children.json": "../schemas/themes/children.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/themes/parent.json": "../schemas/themes/parent.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/variables/children.json": "../schemas/variables/children.json",
+    "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/variables/parent.json": "../schemas/variables/parent.json"
+  }
+}
