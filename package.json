@@ -1,5 +1,5 @@
 {
-  "name": "validation",
+  "name": "open-science-catalog-validation",
   "version": "1.0.0",
   "description": "Validates the metadata",
   "main": "validate.js",

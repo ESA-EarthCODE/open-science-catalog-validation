@@ -12,15 +12,15 @@ const {
 } = require('./definitions.js');
 
 const BEFORE_BUILD = process.env.BUILD_STAGE !== 'after-build';
-const GITHUB_SCHEMA_URI = process.env.GITHUB_SCHEMA_URI || "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main";
+// const GITHUB_SCHEMA_URI = process.env.GITHUB_SCHEMA_URI || "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main";
 
-if (!GITHUB_SCHEMA_URI) {
-  // GITHUB_SCHEMA_URI = "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/";
-  // throw new Error("GITHUB_SCHEMA_URI environment variable is not set");
-}
-else {
-  console.log(`Using schema URI: ${GITHUB_SCHEMA_URI}`);
-}
+// if (!GITHUB_SCHEMA_URI) {
+//   // GITHUB_SCHEMA_URI = "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/";
+//   // throw new Error("GITHUB_SCHEMA_URI environment variable is not set");
+// }
+// else {
+//   console.log(`Using schema URI: ${GITHUB_SCHEMA_URI}`);
+// }
 
 class CustomValidator extends BaseValidator {
 
