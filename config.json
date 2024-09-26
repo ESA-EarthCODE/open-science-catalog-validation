@@ -16,13 +16,5 @@
     "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/themes/parent.json": "../schemas/themes/parent.json",
     "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/variables/children.json": "../schemas/variables/children.json",
     "https://raw.githubusercontent.com/ESA-EarthCODE/open-science-catalog-metadata-validation/main/schemas/variables/parent.json": "../schemas/variables/parent.json"
-  },
-  "files": [
-    "../../eo-missions",
-    "../../products",
-    "../../projects",
-    "../../themes",
-    "../../variables",
-    "../../catalog.json"
-  ]
+  }
 }
