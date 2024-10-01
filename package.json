@@ -1,10 +1,11 @@
 {
-  "name": "validation",
-  "version": "1.0.0",
+  "name": "open-science-catalog-validation",
+  "version": "1.0.0-rc.1",
   "description": "Validates the metadata",
   "main": "validate.js",
   "author": "EOX",
   "license": "ISC",
+  "bin": "./bin/cli.js",
   "dependencies": {
     "fs-extra": "^11.1.1",
     "image-size": "^1.0.2",
