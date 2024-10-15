@@ -4,14 +4,10 @@ const path = require('path');
 const sizeOf = require('image-size');
 const {
   EXTENSION_SCHEMES,
-  TECHNICAL_OFFICER_EXCEPTIONS,
-  VIA_LINK_PROJECT_EXCEPTIONS,
-  VIA_LINK_PRODUCT_EXCEPTIONS,
   ROOT_CHILDREN,
   THEMES_SCHEME
 } = require('./definitions.js');
 
-const BEFORE_BUILD = process.env.BUILD_STAGE !== 'after-build';
 class CustomValidator extends BaseValidator {
 
   constructor() {
@@ -39,15 +35,9 @@ class CustomValidator extends BaseValidator {
 
 	async afterLoading(data, report, config) {
     // Add UI schema to STAC extensions to validate against them additionally
-    const match = report.id.match(/\/(eo-missions|processes|products|projects|themes|variables)\/(catalog.json|.+)/);
-    if (match) {
-      const type = match[1];
-      const level = match[2] === 'catalog.json' ? 'parent' : 'children';
-      const isProcess = type === 'processes' && level === 'children';
-
-      if (!Array.isArray(data.stac_extensions)) {
-        data.stac_extensions = [];
-      }
+    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables)\/(catalog.json|.+)/);
+    if (match && !Array.isArray(data.stac_extensions)) {
+      data.stac_extensions = [];
     }
 
     // Cache title to allow checks for consistent titles
@@ -64,7 +54,7 @@ class CustomValidator extends BaseValidator {
     const isProject = !!report.id.match(/\/projects\/[^\/]+\/collection.json/);
     const isTheme = !!report.id.match(/\/themes\/[^\/]+\/catalog.json/);
     const isVariable = !!report.id.match(/\/variables\/[^\/]+\/catalog.json/);
-    const isSubCatalog = !!report.id.match(/\/(eo-missions|processes|products|projects|themes|variables)\/catalog.json/);
+    const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables)\/catalog.json/);
 
     // Ensure consistent STAC version
     // @todo: Enable STAC 1.1.0 support once released
@@ -83,9 +73,6 @@ class CustomValidator extends BaseValidator {
       let childStacType = 'Catalog';
       if (['products', 'projects'].includes(childEntity)) {
         childStacType = 'Collection';
-      }
-      else if (childEntity === 'processes') {
-        childStacType = 'Process';
       }
       await run.validateSubCatalogs(childStacType);
     }
@@ -154,12 +141,7 @@ class ValidationRun {
     await this.requireRootLink("../catalog.json");
 
     // check child links
-    if (childStacType === 'Process') {
-      await this.requireChildLinksForOtherJsonFiles(null, [], 'cwl', 'process', 'application/cwl');
-    }
-    else {
-      await this.requireChildLinksForOtherJsonFiles(childStacType);
-    }
+    await this.requireChildLinksForOtherJsonFiles(childStacType);
   }
 
   validateUserContent() {
@@ -173,7 +155,6 @@ class ValidationRun {
     this.requireViaLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
-    BEFORE_BUILD && this.disallowRelatedLinks();
   }
 
   async validateProduct() {
@@ -181,22 +162,11 @@ class ValidationRun {
     this.hasExtensions(["osc"]);
     this.ensureIdIsFolderName();
 
-    if (!VIA_LINK_PRODUCT_EXCEPTIONS.includes(this.data.id)) {
-      this.requireViaLink();
-    }
+    this.requireViaLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
-    // BEFORE_BUILD && this.disallowRelatedLinks();
 
     await this.checkOscExtension("product");
-
-    if (Array.isArray(this.data.keywords)) {
-      // Check that keywords do not contain a colon to be able to distinguish them
-      // from the keywords generated based on the OSC extension fields in the builder
-      BEFORE_BUILD && this.data.keywords.forEach(
-        keyword => this.t.truthy(!keyword.includes(':'), `Keyword '${keyword}' MUST NOT contain ':'`)
-      );
-    }
   }
 
   async validateProject() {
@@ -204,16 +174,11 @@ class ValidationRun {
     this.hasExtensions(["osc", "contacts"]);
     this.ensureIdIsFolderName();
 
-    if (!VIA_LINK_PROJECT_EXCEPTIONS.includes(this.data.id)) {
-      this.requireViaLink();
-    }
+    this.requireViaLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
-    BEFORE_BUILD && this.disallowRelatedLinks();
 
-    if (!TECHNICAL_OFFICER_EXCEPTIONS.includes(this.data.id)) {
-      this.requireTechnicalOfficer();
-    }
+    this.requireTechnicalOfficer();
 
     await this.checkOscExtension("project");
   }
@@ -224,7 +189,6 @@ class ValidationRun {
 
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
-    BEFORE_BUILD && this.disallowRelatedLinks();
 
     this.checkPreviewImage();
   }
@@ -237,7 +201,6 @@ class ValidationRun {
     this.requireViaLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
-    BEFORE_BUILD && this.disallowRelatedLinks();
 
     const theme = this.data.themes.find(theme => theme.scheme === THEMES_SCHEME);
 
