@@ -30,5 +30,4 @@ Open Science Catalog requires a certain STAC structure for its entities (product
 These schemas can also be used for e.g. automatically rendering an input form.
 
 # Development
-For development, copy some compatible folder structure into the root folder, then run `npm install` follwed by a `npm test`.
-
+For development, assuming your files reside in a folder called `osc`, run `npm install` follwed by a `node exec.js ./osc/{eo-missions,products,projects,themes,variables}`.
