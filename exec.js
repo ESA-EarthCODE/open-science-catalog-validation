@@ -3,7 +3,8 @@ const validate = require('stac-node-validator/src/index.js');
 const { printSummary, resolveFiles, printReport, abort } = require('stac-node-validator/src/nodeUtils');
 const nodeLoader = require('stac-node-validator/src/loader/node');
 const { getSummary } = require('stac-node-validator/src/utils');
-const CustomValidator = require('./validate-stac-custom.js');
+const CUSTOM_STAC_VALIDATOR_FILES = './validate-stac-custom.js';
+const CustomValidator = require(CUSTOM_STAC_VALIDATOR_FILES);
 const validateRecords = require('./validate-records.js');
 
 async function run() {
@@ -13,7 +14,7 @@ async function run() {
 	// Read config from CLI and config file (if any)
 	let config = ConfigSource.fromCLI();
 	config.loader = nodeLoader;
-	config.custom = "./validate-stac-custom.js";
+	config.custom = CUSTOM_STAC_VALIDATOR_FILES;
 	config.customValidator = new CustomValidator();
 
 	// Abort if no files have been provided
