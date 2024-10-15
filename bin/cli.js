@@ -3,7 +3,7 @@ const { resolve } = require("path");
 const { exec } = require("child_process");
 
 exec(
-  `npm explore open-science-catalog-validation -- npm run test -- ${process.argv
+  `npm explore open-science-catalog-validation -- node exec.js ${process.argv
     .slice(2)
     .map((p) => resolve(p))
     .join(" ")}`,
