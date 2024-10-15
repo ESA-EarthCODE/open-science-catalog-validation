@@ -14,7 +14,7 @@ async function run() {
 	let config = ConfigSource.fromCLI();
 	config.loader = nodeLoader;
 	config.custom = "./validate-stac-custom.js";
-  config.customValidator = new CustomValidator();
+	config.customValidator = new CustomValidator();
 
 	// Abort if no files have been provided
 	if (config.files.length === 0) {
@@ -33,7 +33,7 @@ async function run() {
 	const result = await validate(data, config);
 
 	// Run Records validation
-  await validateRecords(data, config, result);
+	await validateRecords(data, config, result);
 
 	// Print report and summary
 	printReport(result, config);
@@ -49,6 +49,6 @@ async function run() {
 }
 
 run().catch(error => {
-  console.error(error);
-  process.exit(2);
+	console.error(error);
+	process.exit(2);
 });
