@@ -326,9 +326,6 @@ class ValidationRun {
   }
 
   slugify(value) {
-    // This is a simple version and might not work for all cases
-    // as the Python slugify method used in the builder is much more advanced
-    // @todo: use the same slugify method as the builder
     return value
       .replace(/[^a-z0-9]+/gi, '-') // Replace all sequences of non-alphanumeric characters with a dash
       .replace(/^-+|-+$/g, '') // Trim leading/trailing dashes
