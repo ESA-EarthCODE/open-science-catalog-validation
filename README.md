@@ -29,6 +29,8 @@ Open Science Catalog requires a certain STAC structure for its entities (product
 
 These schemas can also be used for e.g. automatically rendering an input form.
 
+To access the schemas in a dereferenced format, use the provided GH pages endpoint, e.g. https://esa-earthcode.github.io/open-science-catalog-validation/schemas/projects/children.json.
+
 # Development
 For development, copy some compatible folder structure into the root folder, then run `npm install` follwed by a `npm test`.
 
