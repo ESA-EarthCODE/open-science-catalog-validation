@@ -10,6 +10,7 @@ exec(
   (error, stdout) => {
     if (error) {
       console.error("Validation failed!");
+      process.exitCode = 1;
     } else {
       console.info("Validation successful!");
     }
