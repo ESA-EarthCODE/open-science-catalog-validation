@@ -95,7 +95,7 @@ class CustomValidator extends BaseValidator {
       await run.validateVariable();
     }
     else {
-      test.fail("File should not exist");
+      test.fail("A file was found in an unexpected location. Validation must occur in the context of a full OSC metadata catalog. Files outside of the expected structure can't be validated.");
     }
   }
 }
