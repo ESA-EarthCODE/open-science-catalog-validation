@@ -8,11 +8,22 @@ const {
   THEMES_SCHEME
 } = require('./definitions.js');
 
+const RECORDS_CONFORMANCE_CLASS = "http://wis.wmo.int/spec/wcmp/2/conf/core"; // todo
+
 class CustomValidator extends BaseValidator {
 
   constructor() {
     super();
     this.titles = {};
+    this.recordsValidator = null;
+  }
+
+  async getRecordsValidator(ajv) {
+    if (this.recordsValidator === null) {
+      const recordsSchema = await fs.readJson('./schemas/records.json');
+      this.recordsValidator = await ajv.compileAsync(recordsSchema);
+    }
+    return this.recordsValidator;
   }
 
   async getTitleForFile(file) {
@@ -33,7 +44,33 @@ class CustomValidator extends BaseValidator {
     }
   }
 
-	async afterLoading(data, report, config) {
+  async bypassValidation(data, report, config) {
+    if (Array.isArray(data.conformsTo) && data.conformsTo.includes(RECORDS_CONFORMANCE_CLASS)) {
+      const setValidity = (errors = []) => {
+        report.valid = report.valid !== false && errors.length === 0;
+        report.results.core = errors;
+      };
+      const recordsValidator = await this.getRecordsValidator(config.ajv);
+      try {
+        const valid = recordsValidator(data);
+        if (!valid) {
+          setValidity(recordsValidator.errors);
+        }
+        else {
+          setValidity();
+        }
+      } catch (error) {
+        setValidity([{ message: error.message }]);
+      }
+
+      // If stac_version is present, continue with STAC validation additionally.
+      // Otherwise return report and abort validation.
+      return (typeof data.stac_version !== 'string') ? report : null;
+    }
+    return null;
+  }
+
+  async afterLoading(data, report, config) {
     // Add UI schema to STAC extensions to validate against them additionally
     const match = report.id.match(/\/(eo-missions|products|projects|themes|variables)\/(catalog.json|.+)/);
     if (match && !Array.isArray(data.stac_extensions)) {
@@ -44,7 +81,7 @@ class CustomValidator extends BaseValidator {
     this.registerTitle(report.id, data);
 
     return data;
-	}
+  }
 
   async afterValidation(data, test, report, config) {
     const isRootCatalog = report.id.endsWith('/catalog.json') && data.id === "osc";
