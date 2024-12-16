@@ -1,4 +1,5 @@
 const BaseValidator = require('stac-node-validator/src/baseValidator.js');
+const { isObject } = require('stac-node-validator/src/utils.js');
 const fs = require('fs-extra');
 const path = require('path');
 const sizeOf = require('image-size');
@@ -207,7 +208,7 @@ class ValidationRun {
     this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
 
     const conceptArray = theme.concepts.map(concept => concept.id);
-    await this.checkOscCrossRefArray(conceptArray, "themes");
+    await this.checkOscCrossRefArray(theme, "concepts", "themes");
   }
 
   hasExtensions(extensions) {
@@ -224,7 +225,10 @@ class ValidationRun {
   checkPreviewImage() {
     // Check that the theme has a preview image with valid properties and that the file exists
     const link = this.data.getLinkWithRel("preview");
-    this.t.truthy(link, "must have 'preview' link");
+    this.t.truthy(isObject(link), "must have 'preview' link");
+    if (!isObject(link)) {
+      return;
+    }
     this.t.equal(link.type, "image/webp");
     this.t.equal(link["proj:epsg"], null);
 
@@ -304,15 +308,20 @@ class ValidationRun {
     this.t.equal(this.data["osc:type"], type, `'osc:type' must be '${type}'`);
 
     if (type === "product") {
-      await this.checkOscCrossRef(this.data["osc:project"], "projects");
-      await this.checkOscCrossRefArray(this.data["osc:variables"], "variables");
+      this.t.equal(typeof this.data["osc:project"], 'string', `'osc:project' must be a string`);
+      if (typeof this.data["osc:project"] === 'string') {
+        await this.checkOscCrossRef(this.data["osc:project"], "projects");
+      }
+      await this.checkOscCrossRefArray(this.data, "osc:variables", "variables");
     }
-    await this.checkOscCrossRefArray(this.data["osc:missions"], "eo-missions");
-    await this.checkOscCrossRefArray(this.data["osc:themes"], "themes");
+    await this.checkOscCrossRefArray(this.data, "osc:missions", "eo-missions");
+    await this.checkOscCrossRefArray(this.data, "osc:themes", "themes");
   }
 
-  async checkOscCrossRefArray(values, type) {
-    if (typeof values !== 'undefined') {
+  async checkOscCrossRefArray(data, field, type) {
+    const values = data[field];
+    this.t.truthy(Array.isArray(values), `'${field}' must be an array`);
+    if (Array.isArray(values)) {
       await Promise.all(values.map(value => this.checkOscCrossRef(value, type)));
     }
   }
@@ -326,7 +335,7 @@ class ValidationRun {
   }
 
   slugify(value) {
-    return value
+    return String(value)
       .replace(/[^a-z0-9]+/gi, '-') // Replace all sequences of non-alphanumeric characters with a dash
       .replace(/^-+|-+$/g, '') // Trim leading/trailing dashes
       .toLowerCase();
@@ -362,7 +371,10 @@ class ValidationRun {
 
   async checkStacLink(type, expectedPath) {
     const link = this.data.getLinkWithRel(type);
-    this.t.truthy(link, `must have ${type} link`);
+    this.t.truthy(isObject(link), `must have ${type} link`);
+    if (!isObject(link)) {
+      return;
+    }
     // @todo: make more robust and make it work with absolute links
     this.t.equal(link.href, expectedPath, `${type} link must point to ${expectedPath}`);
     this.t.equal(link.type, "application/json", `${type} link type must be of type application/json`);
@@ -374,7 +386,7 @@ class ValidationRun {
 
   requireViaLink() {
     const link = this.data.getLinkWithRel("via");
-    this.t.truthy(link, "must have 'via' link");
+    this.t.truthy(isObject(link), "must have 'via' link");
     // @todo: enable if we can ensure that all links have a HTML media type
     // this.test.equal(link.type, "text/html", "via link type must be of type text/html");
   }
