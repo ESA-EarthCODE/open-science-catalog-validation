@@ -207,8 +207,10 @@ class ValidationRun {
 
     this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
 
-    const conceptArray = theme.concepts.map(concept => concept.id);
-    await this.checkOscCrossRefArray(theme, "concepts", "themes");
+    const copy = {
+      concepts: theme.concepts.map(concept => concept.id)
+    };
+    await this.checkOscCrossRefArray(copy, "concepts", "themes");
   }
 
   hasExtensions(extensions) {
@@ -315,7 +317,9 @@ class ValidationRun {
       await this.checkOscCrossRefArray(this.data, "osc:variables", "variables");
     }
     await this.checkOscCrossRefArray(this.data, "osc:missions", "eo-missions");
-    await this.checkOscCrossRefArray(this.data, "osc:themes", "themes");
+    if (typeof this.data["osc:themes"] !== 'undefined') {
+      await this.checkOscCrossRefArray(this.data, "osc:themes", "themes");
+    }
   }
 
   async checkOscCrossRefArray(data, field, type) {
