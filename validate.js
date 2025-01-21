@@ -9,7 +9,7 @@ const {
   THEMES_SCHEME
 } = require('./definitions.js');
 
-const RECORDS_CONFORMANCE_CLASS = "http://wis.wmo.int/spec/wcmp/2/conf/core"; // todo
+const RECORDS_CONFORMANCE_CLASS = "http://www.opengis.net/spec/ogcapi-records-1/1.0/req/record-core";
 
 class CustomValidator extends BaseValidator {
 
@@ -92,7 +92,7 @@ class CustomValidator extends BaseValidator {
     const isProject = !!report.id.match(/\/projects\/[^\/]+\/collection.json/);
     const isTheme = !!report.id.match(/\/themes\/[^\/]+\/catalog.json/);
     const isVariable = !!report.id.match(/\/variables\/[^\/]+\/catalog.json/);
-    const isProccess = !!report.id.match(/\/processes\/[^\/]+\/catalog.json/);
+    const isProccess = !!report.id.match(/\/processes\/[^\/]+\/item.json/);
     const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables|processes)\/catalog.json/);
 
     // Ensure consistent STAC version
@@ -112,6 +112,9 @@ class CustomValidator extends BaseValidator {
       let childStacType = 'Catalog';
       if (['products', 'projects'].includes(childEntity)) {
         childStacType = 'Collection';
+      }
+      else if (['processes'].includes(childEntity)) {
+        childStacType = 'Item';
       }
       await run.validateSubCatalogs(childStacType);
     }
@@ -259,6 +262,7 @@ class ValidationRun {
     this.hasExtensions(["themes"]);
     this.ensureIdIsFolderName();
 
+    //TODO add support for relative links
     this.requireDataLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");

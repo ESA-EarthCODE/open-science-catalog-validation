@@ -43,21 +43,21 @@
       "$ref": "#/definitions/extent"
     },
     "providers": {
-      "$comment": "Currently unusued by OSC catalog",
+      "$comment": "Currently unused by OSC catalog",
       "type": "array",
       "options": {
         "hidden": true
       }
     },
     "summaries": {
-      "$comment": "Currently unusued by OSC catalog",
+      "$comment": "Currently unused by OSC catalog",
       "type": "array",
       "options": {
         "hidden": true
       }
     },
     "assets": {
-      "$comment": "Currently unusued by OSC catalog",
+      "$comment": "Currently unused by OSC catalog",
       "type": "object",
       "options": {
         "hidden": true
