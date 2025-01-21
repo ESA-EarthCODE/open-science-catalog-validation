@@ -73,7 +73,7 @@ class CustomValidator extends BaseValidator {
 
   async afterLoading(data, report, config) {
     // Add UI schema to STAC extensions to validate against them additionally
-    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables)\/(catalog.json|.+)/);
+    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables|processes)\/(catalog.json|.+)/);
     if (match && !Array.isArray(data.stac_extensions)) {
       data.stac_extensions = [];
     }
@@ -92,7 +92,8 @@ class CustomValidator extends BaseValidator {
     const isProject = !!report.id.match(/\/projects\/[^\/]+\/collection.json/);
     const isTheme = !!report.id.match(/\/themes\/[^\/]+\/catalog.json/);
     const isVariable = !!report.id.match(/\/variables\/[^\/]+\/catalog.json/);
-    const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables)\/catalog.json/);
+    const isProccess = !!report.id.match(/\/processes\/[^\/]+\/catalog.json/);
+    const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables|processes)\/catalog.json/);
 
     // Ensure consistent STAC version
     // @todo: Enable STAC 1.1.0 support once released
@@ -131,6 +132,9 @@ class CustomValidator extends BaseValidator {
     }
     else if (isVariable) {
       await run.validateVariable();
+    }
+    else if (isProcess) {
+      await run.validateProcess();
     }
     else {
       test.fail("A file was found in an unexpected location. Validation must occur in the context of a full OSC metadata catalog. Files outside of the expected structure can't be validated.");
@@ -237,6 +241,25 @@ class ValidationRun {
     this.ensureIdIsFolderName();
 
     this.requireViaLink();
+    await this.requireParentLink("../catalog.json");
+    await this.requireRootLink("../../catalog.json");
+
+    const theme = this.data.themes.find(theme => theme.scheme === THEMES_SCHEME);
+
+    this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
+
+    const copy = {
+      concepts: theme.concepts.map(concept => concept.id)
+    };
+    await this.checkOscCrossRefArray(copy, "concepts", "themes");
+  }
+
+  async validateProcess() {
+    this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
+    this.hasExtensions(["themes"]);
+    this.ensureIdIsFolderName();
+
+    this.requireDataLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
 
@@ -430,6 +453,11 @@ class ValidationRun {
     this.t.truthy(isObject(link), "must have 'via' link");
     // @todo: enable if we can ensure that all links have a HTML media type
     // this.test.equal(link.type, "text/html", "via link type must be of type text/html");
+  }
+
+  requireDataLink() {
+    const link = this.data.getLinkWithRel("data");
+    this.t.truthy(isObject(link), "must have 'data' link");
   }
 
 }
