@@ -6,7 +6,6 @@ const EXTENSION_SCHEMES = {
 
 const ROOT_CHILDREN = [
   './eo-missions/catalog.json',
-  './processes/catalog.json',
   './products/catalog.json',
   './projects/catalog.json',
   './themes/catalog.json',
