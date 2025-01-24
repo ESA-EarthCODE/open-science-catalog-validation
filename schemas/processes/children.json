@@ -36,9 +36,6 @@
           "format": "osc-project",
           "minLength": 1
         },
-        "osc:region": {
-          "$ref": "../collection.json#/definitions/osc_region"
-        },
         "osc:missions": {
           "$ref": "../collection.json#/definitions/osc_missions"
         },
