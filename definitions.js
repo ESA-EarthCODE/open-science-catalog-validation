@@ -9,7 +9,8 @@ const ROOT_CHILDREN = [
   './products/catalog.json',
   './projects/catalog.json',
   './themes/catalog.json',
-  './variables/catalog.json'
+  './variables/catalog.json',
+  './processes/catalog.json'
 ];
 
 const THEMES_SCHEME = 'https://github.com/stac-extensions/osc#theme';

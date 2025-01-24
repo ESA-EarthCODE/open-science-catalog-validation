@@ -3,17 +3,29 @@ const { isObject } = require('stac-node-validator/src/utils.js');
 const fs = require('fs-extra');
 const path = require('path');
 const sizeOf = require('image-size');
+const Test = require('stac-node-validator/src/test.js');
 const {
   EXTENSION_SCHEMES,
   ROOT_CHILDREN,
   THEMES_SCHEME
 } = require('./definitions.js');
 
+const RECORDS_CONFORMANCE_CLASS = "http://www.opengis.net/spec/ogcapi-records-1/1.0/req/record-core";
+
 class CustomValidator extends BaseValidator {
 
   constructor() {
     super();
     this.titles = {};
+    this.recordsValidator = null;
+  }
+
+  async getRecordsValidator(ajv) {
+    if (this.recordsValidator === null) {
+      const recordsSchema = await fs.readJson('./schemas/records.json');
+      this.recordsValidator = await ajv.compileAsync(recordsSchema);
+    }
+    return this.recordsValidator;
   }
 
   async getTitleForFile(file) {
@@ -34,18 +46,60 @@ class CustomValidator extends BaseValidator {
     }
   }
 
-	async afterLoading(data, report, config) {
-    // Add UI schema to STAC extensions to validate against them additionally
-    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables)\/(catalog.json|.+)/);
-    if (match && !Array.isArray(data.stac_extensions)) {
-      data.stac_extensions = [];
+  async bypassValidation(data, report, config) {
+    if (Array.isArray(data.conformsTo) && data.conformsTo.includes(RECORDS_CONFORMANCE_CLASS)) {
+      const setValidity = (errors = []) => {
+        report.valid = report.valid !== false && errors.length === 0;
+        report.results.core = errors;
+      };
+      const recordsValidator = await this.getRecordsValidator(config.ajv);
+      try {
+        const valid = recordsValidator(data);
+        if (!valid) {
+          setValidity(recordsValidator.errors);
+        }
+        else {
+          setValidity();
+        }
+      } catch (error) {
+        setValidity([{ message: error.message }]);
+      }
+
+      const isProcess = !!report.id.match(/\/processes\/[^\/]+\/item.json/);
+      const test = new Test();
+      const run = new ValidationRun(this, data, test, report);
+      if (isProcess) {
+        await run.validateProcess();
+      }
+
+      // If stac_version is present, continue with STAC validation additionally.
+      // Otherwise return report and abort validation.
+      return (typeof data.stac_version !== 'string') ? report : null;
     }
+    return null;
+  }
+
+  async afterLoading(data, report, config) {
+    // Add UI schema to STAC extensions to validate against them additionally
+    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables|processes)\/(catalog.json|.+)/);
+
+// TODO Load schema files (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
+//    if (match) {
+//      const type = match[1];
+//      const level = match[2] === 'catalog.json' ? 'parent' : 'children';
+//
+//      if (!Array.isArray(data.stac_extensions)) {
+//        data.stac_extensions = [];
+//      }
+//
+//      data.stac_extensions.push('./schemas/'+type+'/'+level+'.json');
+//    }
 
     // Cache title to allow checks for consistent titles
     this.registerTitle(report.id, data);
 
     return data;
-	}
+  }
 
   async afterValidation(data, test, report, config) {
     const isRootCatalog = report.id.endsWith('/catalog.json') && data.id === "osc";
@@ -55,7 +109,7 @@ class CustomValidator extends BaseValidator {
     const isProject = !!report.id.match(/\/projects\/[^\/]+\/collection.json/);
     const isTheme = !!report.id.match(/\/themes\/[^\/]+\/catalog.json/);
     const isVariable = !!report.id.match(/\/variables\/[^\/]+\/catalog.json/);
-    const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables)\/catalog.json/);
+    const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables|processes)\/catalog.json/);
 
     // Ensure consistent STAC version
     // @todo: Enable STAC 1.1.0 support once released
@@ -74,6 +128,9 @@ class CustomValidator extends BaseValidator {
       let childStacType = 'Catalog';
       if (['products', 'projects'].includes(childEntity)) {
         childStacType = 'Collection';
+      }
+      else if (['processes'].includes(childEntity)) {
+        childStacType = 'Item';
       }
       await run.validateSubCatalogs(childStacType);
     }
@@ -207,8 +264,23 @@ class ValidationRun {
 
     this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
 
-    const conceptArray = theme.concepts.map(concept => concept.id);
-    await this.checkOscCrossRefArray(theme, "concepts", "themes");
+    const copy = {
+      concepts: theme.concepts.map(concept => concept.id)
+    };
+    await this.checkOscCrossRefArray(copy, "concepts", "themes");
+  }
+
+  async validateProcess() {
+    this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
+    this.hasExtensions(["themes"]);
+    this.ensureIdIsFolderName();
+
+    //TODO add support for relative links
+
+// TODO Extend process validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
+//    this.requireDataLink();
+//    await this.requireParentLink("../catalog.json");
+//    await this.requireRootLink("../../catalog.json");
   }
 
   hasExtensions(extensions) {
@@ -315,7 +387,9 @@ class ValidationRun {
       await this.checkOscCrossRefArray(this.data, "osc:variables", "variables");
     }
     await this.checkOscCrossRefArray(this.data, "osc:missions", "eo-missions");
-    await this.checkOscCrossRefArray(this.data, "osc:themes", "themes");
+    if (typeof this.data["osc:themes"] !== 'undefined') {
+      await this.checkOscCrossRefArray(this.data, "osc:themes", "themes");
+    }
   }
 
   async checkOscCrossRefArray(data, field, type) {

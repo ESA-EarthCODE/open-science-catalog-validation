@@ -12,7 +12,7 @@ npm install ESA-EarthCODE/open-science-catalog-validation
 Then, inside a folder containing a STAC structure compatible with Open Science Catalog, run:
 
 ```bash
-open-science-catalog-validation ./{eo-missions,products,projects,themes,variables}
+open-science-catalog-validation ./{eo-missions,products,projects,themes,variables,processes}
 ```
 
 Example for single file validation:
@@ -32,5 +32,5 @@ These schemas can also be used for e.g. automatically rendering an input form.
 To access the schemas in a dereferenced format, use the provided GH pages endpoint, e.g. https://esa-earthcode.github.io/open-science-catalog-validation/schemas/projects/children.json.
 
 # Development
-For development, copy some compatible folder structure into the root folder, then run `npm install` follwed by a `npm test`.
+For development, copy some compatible folder structure into the root folder, then run `npm install` followed by a `npm test`.
 
