@@ -738,7 +738,8 @@
                 "dataset",
                 "service",
                 "process",
-                "workflow"
+                "workflow",
+                "experiment"
               ]
             }
           }

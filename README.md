@@ -12,7 +12,7 @@ npm install ESA-EarthCODE/open-science-catalog-validation
 Then, inside a folder containing a STAC structure compatible with Open Science Catalog, run:
 
 ```bash
-open-science-catalog-validation ./{eo-missions,products,projects,themes,variables,processes}
+open-science-catalog-validation ./{eo-missions,products,projects,themes,variables,workflows,experiments}
 ```
 
 Example for single file validation:
@@ -25,7 +25,7 @@ open-science-catalog-validation ./projects/3d-earth/collection.json
 This validation package is based on [stac-node-validator](https://github.com/stac-utils/stac-node-validator). Additional to generic validation following the [STAC spec](https://github.com/radiantearth/stac-spec) it does some custom validation (see [./validate.js](./validate.js)).
 
 # Open Science Catalog STAC schema
-Open Science Catalog requires a certain STAC structure for its entities (products, projects, variables etc.). The schema for these can be found in [./schemas](./schemas).
+Open Science Catalog requires a certain STAC and Records structure for its entities (products, projects, variables, workflows, experiments, etc.). The schema for these can be found in [./schemas](./schemas).
 
 These schemas can also be used for e.g. automatically rendering an input form.
 

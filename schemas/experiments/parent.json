@@ -1,5 +1,5 @@
 {
-  "title": "Catalog of Processes",
+  "title": "Catalog of Experiments",
   "allOf": [
     {
       "$ref": "../catalog.json"

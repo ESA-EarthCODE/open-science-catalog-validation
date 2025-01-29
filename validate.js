@@ -65,11 +65,15 @@ class CustomValidator extends BaseValidator {
         setValidity([{ message: error.message }]);
       }
 
-      const isProcess = !!report.id.match(/\/processes\/[^\/]+\/item.json/);
+      const isWorkflow = !!report.id.match(/\/workflows\/[^\/]+\/item.json/);
+      const isExperiment = !!report.id.match(/\/experiments\/[^\/]+\/item.json/);
       const test = new Test();
       const run = new ValidationRun(this, data, test, report);
-      if (isProcess) {
-        await run.validateProcess();
+      if (isWorkflow) {
+        await run.validateWorkflow();
+      }
+      else if (isExperiment) {
+        await run.validateExperiment();
       }
 
       // If stac_version is present, continue with STAC validation additionally.
@@ -81,7 +85,7 @@ class CustomValidator extends BaseValidator {
 
   async afterLoading(data, report, config) {
     // Add UI schema to STAC extensions to validate against them additionally
-    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables|processes)\/(catalog.json|.+)/);
+    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables|workflows|experiments)\/(catalog.json|.+)/);
 
 // TODO Load schema files (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
 //    if (match) {
@@ -109,7 +113,7 @@ class CustomValidator extends BaseValidator {
     const isProject = !!report.id.match(/\/projects\/[^\/]+\/collection.json/);
     const isTheme = !!report.id.match(/\/themes\/[^\/]+\/catalog.json/);
     const isVariable = !!report.id.match(/\/variables\/[^\/]+\/catalog.json/);
-    const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables|processes)\/catalog.json/);
+    const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables|workflows|experiments)\/catalog.json/);
 
     // Ensure consistent STAC version
     // @todo: Enable STAC 1.1.0 support once released
@@ -129,7 +133,7 @@ class CustomValidator extends BaseValidator {
       if (['products', 'projects'].includes(childEntity)) {
         childStacType = 'Collection';
       }
-      else if (['processes'].includes(childEntity)) {
+      else if (['workflows', 'experiments'].includes(childEntity)) {
         childStacType = 'Item';
       }
       await run.validateSubCatalogs(childStacType);
@@ -270,14 +274,27 @@ class ValidationRun {
     await this.checkOscCrossRefArray(copy, "concepts", "themes");
   }
 
-  async validateProcess() {
+  async validateWorkflow() {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
     this.hasExtensions(["themes"]);
     this.ensureIdIsFolderName();
 
     //TODO add support for relative links
 
-// TODO Extend process validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
+// TODO Extend workflow validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
+//    this.requireDataLink();
+//    await this.requireParentLink("../catalog.json");
+//    await this.requireRootLink("../../catalog.json");
+  }
+
+  async validateExperiment() {
+    this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
+    this.hasExtensions(["themes"]);
+    this.ensureIdIsFolderName();
+
+    //TODO add support for relative links
+
+// TODO Extend experiment validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
 //    this.requireDataLink();
 //    await this.requireParentLink("../catalog.json");
 //    await this.requireRootLink("../../catalog.json");

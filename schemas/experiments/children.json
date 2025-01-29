@@ -1,5 +1,5 @@
 {
-  "title": "Processes",
+  "title": "Experiments",
   "allOf": [
     {
       "$ref": "../item.json"
