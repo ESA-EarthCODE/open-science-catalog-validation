@@ -215,7 +215,8 @@ class ValidationRun {
     await this.requireRootLink("../catalog.json");
 
     // check child links
-    await this.requireChildLinksForOtherJsonFiles(childStacType);
+    const relType = childStacType === 'Record' ? 'item' : 'child';
+    await this.requireChildLinksForOtherJsonFiles(childStacType, [], relType);
   }
 
   validateUserContent() {
@@ -347,7 +348,7 @@ class ValidationRun {
   }
 
   // check that all files are linked to as child links and that all child links exist
-  async requireChildLinksForOtherJsonFiles(type, files = [], fileExt = 'json', linkRel = 'child', linkType = 'application/json') {
+  async requireChildLinksForOtherJsonFiles(type, files = [], linkRel = 'child', fileExt = 'json', linkType = 'application/json') {
     if(files.length === 0) {
       const dir = await fs.opendir(this.folder);
       for await (const file of dir) {
