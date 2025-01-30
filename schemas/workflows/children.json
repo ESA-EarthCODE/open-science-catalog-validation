@@ -1,5 +1,5 @@
 {
-  "title": "Workflows",
+  "title": "Workflow",
   "allOf": [
     {
       "$ref": "../records.json"

@@ -1,5 +1,5 @@
 {
-  "title": "Experiments",
+  "title": "Experiment",
   "allOf": [
     {
       "$ref": "../records.json"
@@ -19,7 +19,7 @@
         },
         "osc:type": {
           "type": "string",
-          "enum": ["workflow"],
+          "enum": ["experiment"],
           "options": {
             "hidden": true
           }

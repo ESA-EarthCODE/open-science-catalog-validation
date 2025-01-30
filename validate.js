@@ -76,8 +76,8 @@ class CustomValidator extends BaseValidator {
 
     await this.validateSchema(data, report, config, 'core', 'records.json');
 
-    const isWorkflow = !!report.id.match(/\/workflows\/[^\/]+\/item.json/);
-    const isExperiment = !!report.id.match(/\/experiments\/[^\/]+\/item.json/);
+    const isWorkflow = !!report.id.match(/\/workflows\/[^\/]+\/record.json/);
+    const isExperiment = !!report.id.match(/\/experiments\/[^\/]+\/record.json/);
     const test = new Test();
     const run = new ValidationRun(this, data, test, report);
     if (isWorkflow) {
@@ -146,7 +146,7 @@ class CustomValidator extends BaseValidator {
         childStacType = 'Collection';
       }
       else if (['workflows', 'experiments'].includes(childEntity)) {
-        childStacType = 'Item';
+        childStacType = 'Record';
       }
       await run.validateSubCatalogs(childStacType);
     }
