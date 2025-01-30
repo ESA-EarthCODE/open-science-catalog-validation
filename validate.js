@@ -29,8 +29,12 @@ class CustomValidator extends BaseValidator {
 
   async getTitleForFile(file) {
     if (typeof this.titles[file] === 'undefined') {
-      const stac = await fs.readJson(file);
-      this.registerTitle(file, stac);
+      try {
+        const stac = await fs.readJson(file);
+        this.registerTitle(file, stac);
+      } catch (error) {
+        this.titles[file] = null;
+      }
     }
     return this.titles[file];
   }
@@ -196,7 +200,7 @@ class ValidationRun {
 
     // check parent and root
     await this.requireRootLink("./catalog.json");
-    this.t.truthy(!this.data.getLinkWithRel('parent'), "must NOT have a parent");
+    this.t.truthy(!this.getLinkWithRel(this.data, 'parent'), "must NOT have a parent");
 
     // check child links
     await this.requireChildLinksForOtherJsonFiles("Catalog", ROOT_CHILDREN);
@@ -287,12 +291,11 @@ class ValidationRun {
     this.hasExtensions(["themes"]);
     this.ensureIdIsFolderName();
 
-    //TODO add support for relative links
-
-// TODO Extend workflow validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
-//    this.requireDataLink();
-//    await this.requireParentLink("../catalog.json");
-//    await this.requireRootLink("../../catalog.json");
+    // TODO add support for relative links
+    // TODO Extend workflow validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
+    // this.requireDataLink();
+    await this.requireParentLink("../catalog.json");
+    await this.requireRootLink("../../catalog.json");
   }
 
   async validateExperiment() {
@@ -301,11 +304,10 @@ class ValidationRun {
     this.ensureIdIsFolderName();
 
     //TODO add support for relative links
-
-// TODO Extend experiment validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
-//    this.requireDataLink();
-//    await this.requireParentLink("../catalog.json");
-//    await this.requireRootLink("../../catalog.json");
+    // TODO Extend experiment validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
+    // this.requireDataLink();
+    await this.requireParentLink("../catalog.json");
+    await this.requireRootLink("../../catalog.json");
   }
 
   hasExtensions(extensions) {
@@ -321,7 +323,7 @@ class ValidationRun {
 
   checkPreviewImage() {
     // Check that the theme has a preview image with valid properties and that the file exists
-    const link = this.data.getLinkWithRel("preview");
+    const link = this.getLinkWithRel(this.data, "preview");
     this.t.truthy(isObject(link), "must have 'preview' link");
     if (!isObject(link)) {
       return;
@@ -456,7 +458,7 @@ class ValidationRun {
   }
 
   disallowRelatedLinks() {
-    const link = this.data.getLinkWithRel('related');
+    const link = this.getLinkWithRel(this.data, 'related');
     this.t.truthy(!link, `must NOT have a 'related' link`);
   }
 
@@ -468,8 +470,15 @@ class ValidationRun {
     await this.checkStacLink('root', path);
   }
 
+  getLinkWithRel(data, rel) {
+    if (!Array.isArray(data.links)) {
+      return null;
+    }
+    return data.links.find(link => link.href && link.rel === rel) || null;
+  }
+
   async checkStacLink(type, expectedPath) {
-    const link = this.data.getLinkWithRel(type);
+    const link = this.getLinkWithRel(this.data, type);
     this.t.truthy(isObject(link), `must have ${type} link`);
     if (!isObject(link)) {
       return;
@@ -478,13 +487,13 @@ class ValidationRun {
     this.t.equal(link.href, expectedPath, `${type} link must point to ${expectedPath}`);
     this.t.equal(link.type, "application/json", `${type} link type must be of type application/json`);
 
-    if (typeof link.title !== 'undefined') {
+    if (typeof link.title !== 'undefined') { // todo: do we require titles always? then remove check
       await this.checkLinkTitle(link);
     }
   }
 
   requireViaLink() {
-    const link = this.data.getLinkWithRel("via");
+    const link = this.getLinkWithRel(this.data, "via");
     this.t.truthy(isObject(link), "must have 'via' link");
     // @todo: enable if we can ensure that all links have a HTML media type
     // this.test.equal(link.type, "text/html", "via link type must be of type text/html");
