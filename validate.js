@@ -421,7 +421,7 @@ class ValidationRun {
 
   async checkOscCrossRefArray(data, field, type) {
     const values = data[field];
-    this.t.truthy(Array.isArray(values), `'${field}' must be an array`);
+    this.t.truthy(Array.isArray(values), `'${field}' must be present as an array`);
     if (Array.isArray(values)) {
       await Promise.all(values.map(value => this.checkOscCrossRef(value, type)));
     }
@@ -487,9 +487,7 @@ class ValidationRun {
     this.t.equal(link.href, expectedPath, `${type} link must point to ${expectedPath}`);
     this.t.equal(link.type, "application/json", `${type} link type must be of type application/json`);
 
-    if (typeof link.title !== 'undefined') { // todo: do we require titles always? then remove check
-      await this.checkLinkTitle(link);
-    }
+    await this.checkLinkTitle(link);
   }
 
   requireViaLink() {
