@@ -2,7 +2,7 @@
   "title": "Workflows",
   "allOf": [
     {
-      "$ref": "../item.json"
+      "$ref": "../records.json"
     },
     {
       "type": "object",

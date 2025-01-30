@@ -2,7 +2,7 @@
   "title": "Experiments",
   "allOf": [
     {
-      "$ref": "../item.json"
+      "$ref": "../records.json"
     },
     {
       "type": "object",

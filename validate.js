@@ -1,5 +1,5 @@
 const BaseValidator = require('stac-node-validator/src/baseValidator.js');
-const { isObject } = require('stac-node-validator/src/utils.js');
+const { isObject, loadSchema } = require('stac-node-validator/src/utils.js');
 const fs = require('fs-extra');
 const path = require('path');
 const sizeOf = require('image-size');
@@ -17,15 +17,14 @@ class CustomValidator extends BaseValidator {
   constructor() {
     super();
     this.titles = {};
-    this.recordsValidator = null;
+    this.validators = {};
   }
 
-  async getRecordsValidator(ajv) {
-    if (this.recordsValidator === null) {
-      const recordsSchema = await fs.readJson('./schemas/records.json');
-      this.recordsValidator = await ajv.compileAsync(recordsSchema);
+  async getValidator(config, filepath) {
+    if (!this.validators[filepath]) {
+      this.validators[filepath] = await loadSchema(config, filepath);
     }
-    return this.recordsValidator;
+    return this.validators[filepath];
   }
 
   async getTitleForFile(file) {
@@ -46,58 +45,67 @@ class CustomValidator extends BaseValidator {
     }
   }
 
-  async bypassValidation(data, report, config) {
-    if (Array.isArray(data.conformsTo) && data.conformsTo.includes(RECORDS_CONFORMANCE_CLASS)) {
-      const setValidity = (errors = []) => {
-        report.valid = report.valid !== false && errors.length === 0;
-        report.results.core = errors;
-      };
-      const recordsValidator = await this.getRecordsValidator(config.ajv);
-      try {
-        const valid = recordsValidator(data);
-        if (!valid) {
-          setValidity(recordsValidator.errors);
-        }
-        else {
-          setValidity();
-        }
-      } catch (error) {
-        setValidity([{ message: error.message }]);
+  async validateSchema(data, report, config, key, schema) {
+    schema = this.getSchemaUrl(config, schema);
+    const setValidity = (errors = []) => {
+      report.valid = report.valid !== false && errors.length === 0;
+      report.results[key] = errors;
+    };
+    try {
+      const fn = await this.getValidator(config, schema);
+      const valid = fn(data);
+      if (!valid) {
+        setValidity(fn.errors);
       }
-
-      const isWorkflow = !!report.id.match(/\/workflows\/[^\/]+\/item.json/);
-      const isExperiment = !!report.id.match(/\/experiments\/[^\/]+\/item.json/);
-      const test = new Test();
-      const run = new ValidationRun(this, data, test, report);
-      if (isWorkflow) {
-        await run.validateWorkflow();
+      else {
+        setValidity();
       }
-      else if (isExperiment) {
-        await run.validateExperiment();
-      }
-
-      // If stac_version is present, continue with STAC validation additionally.
-      // Otherwise return report and abort validation.
-      return (typeof data.stac_version !== 'string') ? report : null;
+    } catch (error) {
+      setValidity([{ message: error.message }]);
     }
-    return null;
+  }
+
+  async bypassValidation(data, report, config) {
+    if (!Array.isArray(data.conformsTo) || !data.conformsTo.includes(RECORDS_CONFORMANCE_CLASS)) {
+      return null;
+    }
+
+    await this.validateSchema(data, report, config, 'core', 'records.json');
+
+    const isWorkflow = !!report.id.match(/\/workflows\/[^\/]+\/item.json/);
+    const isExperiment = !!report.id.match(/\/experiments\/[^\/]+\/item.json/);
+    const test = new Test();
+    const run = new ValidationRun(this, data, test, report);
+    if (isWorkflow) {
+      await this.validateSchema(data, report, config, 'custom', 'workflows/children.json');
+      await run.validateWorkflow();
+    }
+    else if (isExperiment) {
+      await this.validateSchema(data, report, config, 'custom', 'experiments/children.json');
+      await run.validateExperiment();
+    }
+
+    // If stac_version is present, continue with STAC validation additionally.
+    // Otherwise return report and abort validation.
+    return (typeof data.stac_version !== 'string') ? report : null;
+  }
+
+  getSchemaUrl(config, filepath) {
+    const url = new URL(filepath, config.SCHEMA_URL);
+    return url.toString();
   }
 
   async afterLoading(data, report, config) {
     // Add UI schema to STAC extensions to validate against them additionally
     const match = report.id.match(/\/(eo-missions|products|projects|themes|variables|workflows|experiments)\/(catalog.json|.+)/);
-
-// TODO Load schema files (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
-//    if (match) {
-//      const type = match[1];
-//      const level = match[2] === 'catalog.json' ? 'parent' : 'children';
-//
-//      if (!Array.isArray(data.stac_extensions)) {
-//        data.stac_extensions = [];
-//      }
-//
-//      data.stac_extensions.push('./schemas/'+type+'/'+level+'.json');
-//    }
+    if (match) {
+      const type = match[1];
+      const level = match[2] === 'catalog.json' ? 'parent' : 'children';
+      if (!Array.isArray(data.stac_extensions)) {
+        data.stac_extensions = [];
+      }
+      data.stac_extensions.push(this.getSchemaUrl(config, `${type}/${level}.json`));
+    }
 
     // Cache title to allow checks for consistent titles
     this.registerTitle(report.id, data);

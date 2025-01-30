@@ -10,10 +10,10 @@
     "@apidevtools/json-schema-ref-parser": "^11.7.2",
     "fs-extra": "^11.1.1",
     "image-size": "^1.0.2",
-    "stac-node-validator": "2.0.0-beta.13"
+    "stac-node-validator": "2.0.0-beta.15"
   },
   "scripts": {
     "dereference": "node ./dereference.js",
-    "test": "stac-node-validator --config config.json"
+    "test": "stac-node-validator --config config.js"
   }
 }
