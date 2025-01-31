@@ -166,16 +166,8 @@
         "minLength": 1
       }
     },
-    "osc_themes": {
-      "title": "Themes",
-      "type": "array",
-      "format": "osc-themes",
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "format": "osc-theme",
-        "minLength": 1
-      }
+    "themes": {
+      "$ref": "./themes.json"
     }
   }
 }
