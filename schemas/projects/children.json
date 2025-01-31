@@ -30,8 +30,8 @@
         "osc:missions": {
           "$ref": "../collection.json#/definitions/osc_missions"
         },
-        "osc:themes": {
-          "$ref": "../collection.json#/definitions/osc_themes"
+        "themes": {
+          "$ref": "../collection.json#/definitions/themes"
         },
         "contacts": {
           "options": {
