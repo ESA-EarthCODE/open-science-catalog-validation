@@ -422,6 +422,7 @@ class ValidationRun {
   async checkThemes(data) {
     this.t.truthy(Array.isArray(data.themes), `'themes' must be present as an array`);
     this.t.truthy(typeof data['osc:themes'] === 'undefined', `'osc:themes' must be NOT be present any longer`);
+    this.t.truthy(data.stac_extensions.includes(EXTENSION_SCHEMES.themes), `themes extension must be implemented`);
     const theme = data.themes.find(theme => theme.scheme == THEMES_SCHEME);
     this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
     this.t.truthy(Array.isArray(theme.concepts), `concepts in themes must be present as an array`);
