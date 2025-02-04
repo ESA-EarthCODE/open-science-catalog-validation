@@ -18,6 +18,7 @@ class CustomValidator extends BaseValidator {
     super();
     this.titles = {};
     this.validators = {};
+    this.fileExistsCache = {};
   }
 
   async getValidator(config, filepath) {
@@ -115,6 +116,13 @@ class CustomValidator extends BaseValidator {
     this.registerTitle(report.id, data);
 
     return data;
+  }
+
+  async fileExists(filepath) {
+    if (typeof this.fileExistsCache[filepath] === 'undefined') {
+      this.fileExistsCache[filepath] = await fs.pathExists(filepath);
+    }
+    return this.fileExistsCache[filepath];
   }
 
   async afterValidation(data, test, report, config) {
@@ -277,14 +285,7 @@ class ValidationRun {
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
 
-    const theme = this.data.themes.find(theme => theme.scheme === THEMES_SCHEME);
-
-    this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
-
-    const copy = {
-      concepts: theme.concepts.map(concept => concept.id)
-    };
-    await this.checkOscCrossRefArray(copy, "concepts", "themes");
+    await this.checkThemes(this.data);
   }
 
   async validateWorkflow() {
@@ -415,8 +416,30 @@ class ValidationRun {
       await this.checkOscCrossRefArray(this.data, "osc:variables", "variables");
     }
     await this.checkOscCrossRefArray(this.data, "osc:missions", "eo-missions");
-    if (typeof this.data["osc:themes"] !== 'undefined') {
-      await this.checkOscCrossRefArray(this.data, "osc:themes", "themes");
+    await this.checkThemes(this.data);
+  }
+
+  async checkThemes(data) {
+    this.t.truthy(Array.isArray(data.themes), `'themes' must be present as an array`);
+    this.t.truthy(typeof data['osc:themes'] === 'undefined', `'osc:themes' must be NOT be present any longer`);
+    this.t.truthy(data.stac_extensions.includes(EXTENSION_SCHEMES.themes), `themes extension must be implemented`);
+    const theme = data.themes.find(theme => theme.scheme == THEMES_SCHEME);
+    this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
+    this.t.truthy(Array.isArray(theme.concepts), `concepts in themes must be present as an array`);
+    // Check cross references (i.e. whether given theme has a catalog in /themes/)
+    if (Array.isArray(theme.concepts)) {
+      await Promise.all(theme.concepts.map(async (obj) => {
+        const filepath = this.resolve(this.folder, `../../themes/${obj.id}/catalog.json`);
+        const exists = await this.parent.fileExists(filepath);
+        this.t.truthy(exists, `The referenced theme '${obj.id}' must exist at ${filepath}`);
+      }));
+      theme.concepts.forEach((obj) => {
+        const link = data.links.find(link => link.rel === "related" && link.href.endsWith(`/themes/${obj.id}/catalog.json`));
+        this.t.truthy(link, `must have a 'related' link to the theme '${obj.id}'`);
+        if (link) {
+          this.t.truthy(link.type === "application/json", `type of 'related' link to the theme '${obj.id}' must be 'application/json'`);
+        }
+      });
     }
   }
 
@@ -432,8 +455,8 @@ class ValidationRun {
     const slug = this.slugify(value);
     const filename = ['products', 'projects'].includes(type) ? 'collection' : 'catalog';
     const filepath = this.resolve(this.folder, `../../${type}/${slug}/${filename}.json`);
-
-    this.t.truthy(await fs.pathExists(filepath), `The referenced ${type} '${value}' must exist at ${filepath}`);
+    const exists = await await this.parent.fileExists(filepath);
+    this.t.truthy(exists, `The referenced ${type} '${value}' must exist at ${filepath}`);
   }
 
   slugify(value) {
