@@ -250,6 +250,28 @@
         }
       }
     },
+    "links_root_parent_item": {
+      "properties": {
+        "links": {
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/stac_link_root"
+              },
+              {
+                "$ref": "#/definitions/stac_link_parent_readonly"
+              },
+              {
+                "$ref": "#/definitions/stac_link_self"
+              },
+              {
+                "$ref": "#/definitions/stac_link_item"
+              }
+            ]
+          }
+        }
+      }
+    },
     "stac_link_root": {
       "title": "STAC Root Link",
       "properties": {
@@ -318,6 +340,23 @@
         },
         "rel": {
           "enum": ["child"],
+          "options": {
+            "hidden": true
+          }
+        }
+      }
+    },
+    "stac_link_item": {
+      "title": "STAC Item/Record Link",
+      "properties": {
+        "type": {
+          "enum": ["application/json"],
+          "options": {
+            "hidden": true
+          }
+        },
+        "rel": {
+          "enum": ["item"],
           "options": {
             "hidden": true
           }

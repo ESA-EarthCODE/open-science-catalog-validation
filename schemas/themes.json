@@ -1,0 +1,47 @@
+{
+  "type": "array",
+  "format": "osc-themes",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "required": [
+      "concepts",
+      "scheme"
+    ],
+    "properties": {
+      "concepts": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "format": "osc-theme",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "scheme": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

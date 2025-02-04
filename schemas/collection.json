@@ -43,21 +43,21 @@
       "$ref": "#/definitions/extent"
     },
     "providers": {
-      "$comment": "Currently unusued by OSC catalog",
+      "$comment": "Currently unused by OSC catalog",
       "type": "array",
       "options": {
         "hidden": true
       }
     },
     "summaries": {
-      "$comment": "Currently unusued by OSC catalog",
+      "$comment": "Currently unused by OSC catalog",
       "type": "array",
       "options": {
         "hidden": true
       }
     },
     "assets": {
-      "$comment": "Currently unusued by OSC catalog",
+      "$comment": "Currently unused by OSC catalog",
       "type": "object",
       "options": {
         "hidden": true
@@ -166,16 +166,8 @@
         "minLength": 1
       }
     },
-    "osc_themes": {
-      "title": "Themes",
-      "type": "array",
-      "format": "osc-themes",
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "format": "osc-theme",
-        "minLength": 1
-      }
+    "themes": {
+      "$ref": "./themes.json"
     }
   }
 }
