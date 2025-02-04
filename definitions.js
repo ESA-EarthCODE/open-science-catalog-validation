@@ -11,9 +11,8 @@ const ROOT_CHILDREN = [
   './projects/catalog.json',
   './themes/catalog.json',
   './variables/catalog.json',
-// todo: enable once defined
-// './workflows/catalog.json',
-// './experiments/catalog.json'
+  './workflows/catalog.json',
+  './experiments/catalog.json'
 ];
 
 const THEMES_SCHEME = 'https://github.com/stac-extensions/osc#theme';
