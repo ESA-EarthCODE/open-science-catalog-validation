@@ -47,10 +47,7 @@
                     "readOnly": true
                   },
                   "rel": {
-                    "enum": ["preview"],
-                    "options": {
-                      "hidden": true
-                    }
+                    "enum": ["preview"]
                   },
                   "proj:epsg": {
                     "title": "EPSG Code",

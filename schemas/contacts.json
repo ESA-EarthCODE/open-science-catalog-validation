@@ -3,6 +3,7 @@
   "type": "array",
   "minItems": 1,
   "items": {
+    "title": "Contact",
     "type": "object",
     "required": [
       "name"
@@ -71,13 +72,14 @@
         "title": "Phone Numbers",
         "type": "array",
         "items": {
+          "title": "Phone Number",
           "type": "object",
           "required": [
             "value"
           ],
           "properties": {
             "value": {
-              "title": "Phone Number",
+              "title": "Number",
               "type": "string",
               "pattern": "^\\+[1-9]{1}[0-9]{3,14}$"
             },
@@ -91,13 +93,14 @@
         "title": "Email Addresses",
         "type": "array",
         "items": {
+          "title": "Email Address",
           "type": "object",
           "required": [
             "value"
           ],
           "properties": {
             "value": {
-              "title": "Email Address",
+              "title": "Email",
               "type": "string",
               "format": "email"
             },
@@ -111,6 +114,7 @@
         "title": "Postal Addresses",
         "type": "array",
         "items": {
+          "title": "Postal Address",
           "type": "object",
           "properties": {
             "deliveryPoint": {
@@ -118,6 +122,7 @@
               "description": "Street and Number, P.O. Box, etc.",
               "type": "array",
               "items": {
+                "title": "Line",
                 "type": "string"
               }
             },
@@ -150,6 +155,7 @@
         "title": "Contact Instructions / Notes",
         "type": "array",
         "items": {
+          "title": "Note",
           "type": "string"
         }
       },
@@ -163,6 +169,7 @@
       "title": "Roles",
       "type": "array",
       "items": {
+        "title": "Role",
         "type": "string",
         "minLength": 1
       }

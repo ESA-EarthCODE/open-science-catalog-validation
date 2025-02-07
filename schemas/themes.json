@@ -1,8 +1,10 @@
 {
+  "title": "Themes",
   "type": "array",
   "format": "osc-themes",
   "minItems": 1,
   "items": {
+    "title": "Theme",
     "type": "object",
     "required": [
       "concepts",
