@@ -13,7 +13,10 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "A unique identifier of the catalog record."
+          "description": "A unique identifier of the catalog record.",
+          "options": {
+            "hidden": true
+          }
         },
         "type": {
           "type": "string",
