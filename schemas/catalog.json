@@ -445,5 +445,6 @@
         }
       }
     }
-  }
+  },
+  "format": "categories"
 }
