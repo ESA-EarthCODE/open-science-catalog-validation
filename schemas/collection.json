@@ -95,6 +95,7 @@
           "properties": {
             "bbox": {
               "type": "array",
+              "title": "Bounding Boxes",
               "format": "bounding-boxes",
               "items": {
                 "type": "array",
