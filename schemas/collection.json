@@ -175,5 +175,6 @@
     "themes": {
       "$ref": "./themes.json"
     }
-  }
+  },
+  "format": "categories"
 }
