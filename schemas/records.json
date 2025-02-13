@@ -14,7 +14,10 @@
         "id": {
           "type": "string",
           "description": "A unique identifier of the catalog record.",
-          "format": "uuid"
+          "format": "uuid",
+          "options": {
+            "hidden": true
+          }
         },
         "type": {
           "type": "string",

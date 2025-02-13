@@ -51,6 +51,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
+            "title": "Variable",
             "type": "string",
             "minLength": 1
           }
@@ -59,20 +60,23 @@
           "type": "array",
           "format": "cf-parameters",
           "title": "CF Parameter",
-          "description": "Following the Climate and Forecast (CF) Metadata Conventions: http://cfconventions.org/cf-conventions/cf-conventions.html#_description_of_the_data",
+          "description": "Following the <a href='http://cfconventions.org/cf-conventions/cf-conventions.html#_description_of_the_data'>Climate and Forecast (CF) Metadata Conventions</a>",
           "minItems": 1,
           "uniqueItems": true,
           "items": {
+            "title": "Parameter",
             "type": "object",
             "required": [
               "name"
             ],
             "properties": {
               "name": {
+                "title": "Name",
                 "type": "string",
                 "minLength": 1
               },
               "unit": {
+                "title": "Unit",
                 "type": "string"
               }
             }

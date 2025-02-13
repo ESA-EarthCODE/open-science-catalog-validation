@@ -60,6 +60,9 @@
       "items": {
         "type": "string",
         "format": "url"
+      },
+      "options": {
+        "hidden": true
       }
     },
     "id": {
@@ -84,7 +87,6 @@
       "title": "Links",
       "type": "array",
       "options": {
-        "disable_array_reorder": true,
         "collapsed": true,
         "disable_collapse": false
       },
@@ -93,6 +95,7 @@
       }
     },
     "link": {
+      "title": "Link",
       "type": "object",
       "required": [
         "href",
