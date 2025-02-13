@@ -72,6 +72,7 @@
       "title": "Keywords",
       "type": "array",
       "items": {
+        "title": "Keyword",
         "type": "string",
         "minLength": 1
       },
@@ -94,6 +95,7 @@
           "properties": {
             "bbox": {
               "type": "array",
+              "title": "Bounding Boxes",
               "format": "bounding-boxes",
               "items": {
                 "type": "array",
@@ -117,11 +119,14 @@
           ],
           "properties": {
             "interval": {
+              "title": "Interval",
               "type": "array",
               "items": {
+                "title": "Date range",
                 "type": "array",
                 "format": "temporal-interval",
                 "items": {
+                  "title": "Date",
                   "type": [
                     "string", "null"
                   ],
@@ -161,6 +166,7 @@
       "type": "array",
       "uniqueItems": true,
       "items": {
+        "title": "EO Mission",
         "type": "string",
         "format": "osc-mission",
         "minLength": 1
