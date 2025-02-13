@@ -67,6 +67,7 @@
     },
     "id": {
       "type": "string",
+      "format": "uuid",
       "options": {
         "hidden": true
       }
