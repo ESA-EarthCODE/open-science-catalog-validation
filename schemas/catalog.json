@@ -13,14 +13,7 @@
       "$ref": "#/definitions/stac_version"
     },
     "stac_extensions": {
-      "options": {
-        "hidden": true
-      },
-      "allOf": [
-        {
-          "$ref": "#/definitions/stac_extensions"
-        }
-      ]
+      "$ref": "#/definitions/stac_extensions"
     },
     "id": {
       "$ref": "#/definitions/id"
