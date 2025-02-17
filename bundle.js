@@ -26,7 +26,7 @@ const relativePath = "./schemas";
 const depthRequirement = 1; // Minimum depth for files to be included
 getFilesAtDepth(relativePath, depthRequirement).forEach(async (file) => {
   try {
-    const deref = await $RefParser.dereference(`./${file}`);
+    const deref = await $RefParser.bundle(`./${file}`);
     fs.writeFile(file, JSON.stringify(deref), (err) => {
       if (err) console.log(err);
       else {

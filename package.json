@@ -13,7 +13,7 @@
     "stac-node-validator": "2.0.0-beta.15"
   },
   "scripts": {
-    "dereference": "node ./dereference.js",
+    "bundle": "node ./bundle.js",
     "test": "stac-node-validator --config config.js"
   }
 }
