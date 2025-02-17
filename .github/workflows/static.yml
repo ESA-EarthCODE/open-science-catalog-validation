@@ -32,10 +32,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Dereference files
+      - name: Bundle files
         run: |
           npm install && \
-          npm run dereference
+          npm run bundle
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
