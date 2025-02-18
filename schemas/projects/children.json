@@ -27,9 +27,6 @@
         "osc:region": {
           "$ref": "../collection.json#/definitions/osc_region"
         },
-        "osc:missions": {
-          "$ref": "../collection.json#/definitions/osc_missions"
-        },
         "themes": {
           "$ref": "../collection.json#/definitions/themes"
         },
