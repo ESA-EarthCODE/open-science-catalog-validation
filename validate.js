@@ -136,8 +136,7 @@ class CustomValidator extends BaseValidator {
     const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables|workflows|experiments)\/catalog.json/);
 
     // Ensure consistent STAC version
-    // @todo: Enable STAC 1.1.0 support once released
-    test.equal(data.stac_version, "1.0.0", `stac_version must be '1.0.0'`);
+    test.truthy(["1.0.0", "1.1.0"].includes(data.stac_version), `stac_version must be '1.0.0'`);
 
     // Ensure all catalogs and collections have a title
     test.truthy(!data.isCatalogLike() || (typeof data.title === 'string' && data.title.length > 0), "must have a title");
@@ -228,7 +227,7 @@ class ValidationRun {
   }
 
   validateUserContent() {
-    // @todo: Which rules apply?
+    // todo: Which rules apply?
   }
 
   async validateEoMission() {
@@ -244,6 +243,12 @@ class ValidationRun {
     this.t.equal(this.data.type, "Collection", `type must be 'Collection'`);
     this.hasExtensions(["osc"]);
     this.ensureIdIsFolderName();
+
+    // todo: require related link to project based on osc:project
+    // todo: check related link to variables based on osc:variables
+    // todo: check related link to missions based on osc:missions
+    // todo: check related link to experiment based on osc:experiment
+    // todo: check related link to themes based on themes
 
     this.requireViaLink();
     await this.requireParentLink("../catalog.json");
@@ -264,6 +269,9 @@ class ValidationRun {
     this.t.equal(this.data.type, "Collection", `type must be 'Collection'`);
     this.hasExtensions(["osc", "contacts"]);
     this.ensureIdIsFolderName();
+
+    // todo: check related link to workflows based on osc:workflows
+    // todo: check related link to themes based on themes
 
     this.requireViaLink();
     await this.requireParentLink("../catalog.json");
@@ -305,8 +313,8 @@ class ValidationRun {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
     this.ensureIdIsFolderName();
 
-    // this.requireWorkflowLink();
     // todo: require related link to project based on osc:project
+    // todo: check related links to experiments based on osc:experiments
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
   }
@@ -315,9 +323,8 @@ class ValidationRun {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
     this.ensureIdIsFolderName();
 
-    // this.requireExperimentLink();
-    // todo: require related link to project based on osc:project, osc:workflow, osc:product
-    // tood: require links with relation types "environment", "input"
+    // todo: require related links to project based on osc:project, osc:workflow, osc:product
+    // tood: require links with relation types "environment" and "input"
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
   }
@@ -504,7 +511,7 @@ class ValidationRun {
     if (!isObject(link)) {
       return;
     }
-    // @todo: make more robust and make it work with absolute links
+    // todo: make more robust and make it work with absolute links
     this.t.equal(link.href, expectedPath, `${type} link must point to ${expectedPath}`);
     this.t.equal(link.type, "application/json", `${type} link type must be of type application/json`);
 
@@ -514,7 +521,7 @@ class ValidationRun {
   requireViaLink() {
     const link = this.getLinkWithRel(this.data, "via");
     this.t.truthy(isObject(link), "must have 'via' link");
-    // @todo: enable if we can ensure that all links have a HTML media type
+    // todo: enable if we can ensure that all links have a HTML media type
     // this.test.equal(link.type, "text/html", "via link type must be of type text/html");
   }
 
