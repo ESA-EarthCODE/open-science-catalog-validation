@@ -1,0 +1,86 @@
+{
+  "definitions": {
+    "created": {
+      "title": "Creation Date and Time:",
+      "type": "string",
+      "format": "date-time"
+    },
+    "osc:project": {
+      "title": "Project",
+      "type": "string",
+      "format": "osc-project",
+      "minLength": 1
+    },
+    "osc:product": {
+      "title": "Product",
+      "type": "string",
+      "format": "osc-product",
+      "minLength": 1
+    },
+    "osc:status": {
+      "title": "Status",
+      "type": "string",
+      "enum": [
+        "planned",
+        "ongoing",
+        "completed"
+      ]
+    },
+    "osc:region": {
+      "title": "Region",
+      "type": "string",
+      "minLength": 1
+    },
+    "osc:missions": {
+      "title": "EO Missions",
+      "format": "osc-missions",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "title": "EO Mission",
+        "type": "string",
+        "format": "osc-mission",
+        "minLength": 1
+      }
+    },
+    "osc:variables": {
+      "title": "Variables",
+      "format": "osc-variables",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "title": "Variable",
+        "type": "string",
+        "format": "osc-variable",
+        "minLength": 1
+      }
+    },
+    "osc:experiment": {
+      "title": "Experiment",
+      "format": "osc-experiment",
+      "type": "string",
+      "minLength": 1
+    },
+    "osc:experiments": {
+      "title": "Experiments",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/osc:experiment"
+      }
+    },
+    "osc:workflow": {
+      "title": "Workflow",
+      "type": "string",
+      "format": "osc-workflow",
+      "minLength": 1
+    },
+    "osc:workflows": {
+      "title": "Workflows",
+      "type": "array",
+      "format": "osc-workflows",
+      "items": {
+        "$ref": "#/definitions/osc:workflow"
+      }
+    }
+  }
+}

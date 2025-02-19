@@ -19,32 +19,21 @@
           ],
           "properties": {
             "created": {
-              "title": "Creation Date and Time:",
-              "type": "string",
-              "format": "date-time"
+              "$ref": "../osc.json#/definitions/created"
             },
             "osc:project": {
-              "title": "Project",
-              "type": "string",
-              "format": "osc-project",
-              "minLength": 1
+              "$ref": "../osc.json#/definitions/osc:project"
             },
             "osc:workflow": {
-              "title": "Workflow",
-              "type": "string",
-              "format": "osc-workflow",
-              "minLength": 1
+              "$ref": "../osc.json#/definitions/osc:workflow"
             },
             "osc:product": {
-              "title": "Product",
-              "type": "string",
-              "format": "osc-product",
-              "minLength": 1
+              "$ref": "../osc.json#/definitions/osc:product"
             }
           }
         },
         "links": {
-          "$ref": "../catalog.json#/definitions/links_root_parent_child_related_via_other"
+          "$ref": "../catalog.json#/definitions/links_root_parent_child_related_via_input_environment_other"
         }
       },
       "additionalProperties": true

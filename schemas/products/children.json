@@ -13,9 +13,7 @@
       ],
       "properties": {
         "created": {
-          "title": "Creation Date and Time:",
-          "type": "string",
-          "format": "date-time"
+          "$ref": "../osc.json#/definitions/created"
         },
         "osc:type": {
           "type": "string",
@@ -25,33 +23,25 @@
           }
         },
         "osc:status": {
-          "$ref": "../collection.json#/definitions/osc_status"
+          "$ref": "../osc.json#/definitions/osc:status"
         },
         "osc:project": {
-          "title": "Project",
-          "type": "string",
-          "format": "osc-project",
-          "minLength": 1
+          "$ref": "../osc.json#/definitions/osc:project"
         },
         "osc:region": {
-          "$ref": "../collection.json#/definitions/osc_region"
-        },
-        "osc:missions": {
-          "$ref": "../collection.json#/definitions/osc_missions"
-        },
-        "themes": {
-          "$ref": "../collection.json#/definitions/themes"
+          "$ref": "../osc.json#/definitions/osc:region"
         },
         "osc:variables": {
-          "title": "Variables",
-          "format": "osc-variables",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "title": "Variable",
-            "type": "string",
-            "minLength": 1
-          }
+          "$ref": "../osc.json#/definitions/osc:variables"
+        },
+        "osc:missions": {
+          "$ref": "../osc.json#/definitions/osc:missions"
+        },
+        "osc:experiment": {
+          "$ref": "../osc.json#/definitions/osc:experiment"
+        },
+        "themes": {
+          "$ref": "../themes.json"
         },
         "cf:parameter": {
           "type": "array",

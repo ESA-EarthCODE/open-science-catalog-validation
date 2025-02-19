@@ -33,4 +33,3 @@ To access the schemas in a bundled format (only internal `$ref`s), use the provi
 
 # Development
 For development, copy some compatible folder structure into the root folder, then run `npm install` followed by a `npm test`.
-

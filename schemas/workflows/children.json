@@ -17,15 +17,13 @@
           ],
           "properties": {
             "created": {
-              "title": "Creation Date and Time:",
-              "type": "string",
-              "format": "date-time"
+              "$ref": "../osc.json#/definitions/created"
             },
             "osc:project": {
-              "title": "Project",
-              "type": "string",
-              "format": "osc-project",
-              "minLength": 1
+              "$ref": "../osc.json#/definitions/osc:project"
+            },
+            "osc:experiments": {
+              "$ref": "../osc.json#/definitions/osc:experiments"
             }
           }
         },
