@@ -303,24 +303,21 @@ class ValidationRun {
 
   async validateWorkflow() {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
-    this.hasExtensions(["themes"]);
     this.ensureIdIsFolderName();
 
-    // TODO add support for relative links
-    // TODO Extend workflow validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
-    // this.requireDataLink();
+    // this.requireWorkflowLink();
+    // todo: require related link to project based on osc:project
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
   }
 
   async validateExperiment() {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
-    this.hasExtensions(["themes"]);
     this.ensureIdIsFolderName();
 
-    //TODO add support for relative links
-    // TODO Extend experiment validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
-    // this.requireDataLink();
+    // this.requireExperimentLink();
+    // todo: require related link to project based on osc:project, osc:workflow, osc:product
+    // tood: require links with relation types "environment", "input"
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
   }
