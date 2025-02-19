@@ -249,7 +249,15 @@ class ValidationRun {
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
 
-    await this.checkOscExtension("product");
+    this.t.equal(this.data["osc:type"], "product", `'osc:type' must be 'product'`);
+    this.t.equal(typeof this.data["osc:project"], 'string', `'osc:project' must be a string`);
+    if (typeof this.data["osc:project"] === 'string') {
+      await this.checkOscCrossRef(this.data["osc:project"], "projects");
+    }
+    await this.checkOscCrossRefArray(this.data, "osc:variables", "variables");
+    await this.checkOscCrossRefArray(this.data, "osc:missions", "eo-missions");
+
+    await this.checkThemes(this.data);
   }
 
   async validateProject() {
@@ -263,7 +271,12 @@ class ValidationRun {
 
     this.requireTechnicalOfficer();
 
-    await this.checkOscExtension("project");
+    this.t.equal(this.data["osc:type"], "project", `'osc:type' must be 'project'`);
+    this.t.truthy(typeof data['osc:project'] === 'undefined', `'osc:project' must be NOT be present`);
+    this.t.truthy(typeof data['osc:variables'] === 'undefined', `'osc:variables' must be NOT be present`);
+    this.t.truthy(typeof data['osc:missions'] === 'undefined', `'osc:missions' must be NOT be present`);
+
+    await this.checkThemes(this.data);
   }
 
   async validateTheme() {
@@ -405,20 +418,6 @@ class ValidationRun {
     }
   }
 
-  async checkOscExtension(type) {
-    this.t.equal(this.data["osc:type"], type, `'osc:type' must be '${type}'`);
-
-    if (type === "product") {
-      this.t.equal(typeof this.data["osc:project"], 'string', `'osc:project' must be a string`);
-      if (typeof this.data["osc:project"] === 'string') {
-        await this.checkOscCrossRef(this.data["osc:project"], "projects");
-      }
-      await this.checkOscCrossRefArray(this.data, "osc:variables", "variables");
-    }
-    await this.checkOscCrossRefArray(this.data, "osc:missions", "eo-missions");
-    await this.checkThemes(this.data);
-  }
-
   async checkThemes(data) {
     this.t.truthy(Array.isArray(data.themes), `'themes' must be present as an array`);
     this.t.truthy(typeof data['osc:themes'] === 'undefined', `'osc:themes' must be NOT be present any longer`);
@@ -433,6 +432,7 @@ class ValidationRun {
         const exists = await this.parent.fileExists(filepath);
         this.t.truthy(exists, `The referenced theme '${obj.id}' must exist at ${filepath}`);
       }));
+      this.t.truthy(Array.isArray(data.links), `'links' must be present as an array`);
       theme.concepts.forEach((obj) => {
         const link = data.links.find(link => link.rel === "related" && link.href.endsWith(`/themes/${obj.id}/catalog.json`));
         this.t.truthy(link, `must have a 'related' link to the theme '${obj.id}'`);
