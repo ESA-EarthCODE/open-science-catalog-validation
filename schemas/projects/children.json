@@ -18,9 +18,6 @@
             "hidden": true
           }
         },
-        "osc:name": {
-          "$ref": "../collection.json#/definitions/osc_name"
-        },
         "osc:status": {
           "$ref": "../collection.json#/definitions/osc_status"
         },
