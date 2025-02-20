@@ -72,28 +72,35 @@ class CustomValidator extends BaseValidator {
   }
 
   async bypassValidation(data, report, config) {
-    if (!Array.isArray(data.conformsTo) || !data.conformsTo.includes(RECORDS_CONFORMANCE_CLASS)) {
+    if (typeof data.stac_version !== 'undefined') {
+      // Skip this for STAC entities
       return null;
     }
+
+    const createTestFn = (fn) => async (report, test) => {
+      const run = new ValidationRun(this, data, test, report);
+
+      test.truthy(Array.isArray(data.conformsTo), 'must have a "conformsTo" array');
+      test.truthy(data.conformsTo.includes(RECORDS_CONFORMANCE_CLASS), `must conform to ${RECORDS_CONFORMANCE_CLASS}`);
+  
+      await run[fn]();
+    };
 
     await this.validateSchema(data, report, config, 'core', 'records.json');
 
     const isWorkflow = !!report.id.match(/\/workflows\/[^\/]+\/record.json/);
     const isExperiment = !!report.id.match(/\/experiments\/[^\/]+\/record.json/);
-    const test = new Test();
-    const run = new ValidationRun(this, data, test, report);
     if (isWorkflow) {
       await this.validateSchema(data, report, config, 'custom', 'workflows/children.json');
-      await run.validateWorkflow();
+      await this.testFn(report, createTestFn('validateWorkflow'));
     }
     else if (isExperiment) {
       await this.validateSchema(data, report, config, 'custom', 'experiments/children.json');
-      await run.validateExperiment();
+      await this.testFn(report, createTestFn('validateExperiment'));
     }
 
-    // If stac_version is present, continue with STAC validation additionally.
-    // Otherwise return report and abort validation.
-    return (typeof data.stac_version !== 'string') ? report : null;
+    // Return report and abort validation
+    return report;
   }
 
   getSchemaUrl(config, filepath) {
@@ -314,10 +321,6 @@ class ValidationRun {
   async validateExperiment() {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
     this.ensureIdIsFolderName();
-
-
-    this.t.equal(typeof this.data["osc:project"], 'string', `'osc:project' must be a string`);
-    await this.checkOscCrossRef(this.data["osc:project"], "projects", true); // required
 
     this.t.equal(typeof this.data["osc:workflow"], 'string', `'osc:workflow' must be a string`);
     await this.checkOscCrossRef(this.data["osc:workflow"], "workflows", true); // required
