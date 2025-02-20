@@ -7,6 +7,7 @@ const Test = require('stac-node-validator/src/test.js');
 const {
   EXTENSION_SCHEMES,
   ROOT_CHILDREN,
+  RELATED_TITLE_PREFIX,
   THEMES_SCHEME
 } = require('./definitions.js');
 
@@ -404,7 +405,7 @@ class ValidationRun {
     for(const link of links) {
       this.t.equal(link.type, linkType, `Link with relation ${linkRel} to ${link.href} must be of type ${linkType}`);
       if (link.href.endsWith('.json')) {
-        await this.checkLinkTitle(link, this.folder);
+        await this.checkLinkTitle(link);
       }
     }
 
@@ -421,11 +422,16 @@ class ValidationRun {
     }
   }
 
-  async checkLinkTitle(link) {
+  async checkLinkTitle(link, prefix = '') {
     const href = this.resolve(this.folder, link.href);
     const title = await this.parent.getTitleForFile(href);
     if (typeof title === "string") {
-      this.t.equal(link.title, title, `Title of link to ${link.href} is not the title of the linked file ${href}`);
+      if (prefix) {
+        this.t.equal(link.title, prefix + title, `Title of link to ${link.href} (rel: ${link.rel}) must be '${prefix + title}'`);
+      }
+      else {
+        this.t.equal(link.title, title, `Title of link to ${link.href} (rel: ${link.rel}) is not the title of the linked file ${href}`);
+      }
     }
   }
 
@@ -443,15 +449,17 @@ class ValidationRun {
         this.t.truthy(exists, `The referenced theme '${obj.id}' must exist at ${filepath}`);
       }));
       this.t.truthy(Array.isArray(data.links), `'links' must be present as an array`);
-      theme.concepts.forEach(obj => this.checkRelatedLink(data, "themes", obj.id, "catalog"));
+      await Promise.all(theme.concepts.map(async (obj) => await this.checkRelatedLink(data, "themes", obj.id, "catalog")));
     }
   }
 
-  checkRelatedLink(data, type, id, file = "collection") {
+  async checkRelatedLink(data, type, id, file = "collection") {
     const link = data.links.find(link => link.rel === "related" && link.href.endsWith(`/${type}/${id}/${file}.json`));
     this.t.truthy(link, `must have a 'related' link to ${type} with id '${id}'`);
     if (link) {
       this.t.truthy(link.type === "application/json", `type of 'related' link to ${type} with id '${id}' must be 'application/json'`);
+      const prefix = RELATED_TITLE_PREFIX[type] + ': ';
+      this.checkLinkTitle(link, prefix);
     }
   }
 
@@ -486,7 +494,7 @@ class ValidationRun {
     const filepath = this.resolve(this.folder, `../../${type}/${slug}/${filename}.json`);
     const exists = await await this.parent.fileExists(filepath);
     this.t.truthy(exists, `The referenced ${type} '${value}' must exist at ${filepath}`);
-    this.checkRelatedLink(this.data, type, value, filename);
+    await this.checkRelatedLink(this.data, type, value, filename);
   }
 
   slugify(value) {

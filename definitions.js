@@ -15,10 +15,22 @@ const ROOT_CHILDREN = [
   './experiments/catalog.json'
 ];
 
+
+const RELATED_TITLE_PREFIX = {
+  projects: 'Project',
+  products: 'Product',
+  experiments: 'Experiment',
+  workflows: 'Workflow',
+  themes: 'Theme',
+  variables: 'Variable',
+  'eo-missions': 'EO Mission'
+};
+
 const THEMES_SCHEME = 'https://github.com/stac-extensions/osc#theme';
 
 module.exports = {
   EXTENSION_SCHEMES,
   ROOT_CHILDREN,
+  RELATED_TITLE_PREFIX,
   THEMES_SCHEME
 };
