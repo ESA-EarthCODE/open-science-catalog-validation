@@ -688,7 +688,7 @@
                 "properties": {
                   "href": {
                     "type": "string",
-                    "format": "uri"
+                    "format": "uri-reference"
                   }
                 }
               }

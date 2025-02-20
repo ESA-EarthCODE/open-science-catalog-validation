@@ -140,40 +140,6 @@
           }
         }
       }
-    },
-    "osc_name": {
-      "title": "Name",
-      "type": "string",
-      "minLength": 1
-    },
-    "osc_status": {
-      "title": "Status",
-      "type": "string",
-      "enum": [
-        "planned",
-        "ongoing",
-        "completed"
-      ]
-    },
-    "osc_region": {
-      "title": "Region",
-      "type": "string",
-      "minLength": 1
-    },
-    "osc_missions": {
-      "title": "EO Missions",
-      "format": "osc-missions",
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "title": "EO Mission",
-        "type": "string",
-        "format": "osc-mission",
-        "minLength": 1
-      }
-    },
-    "themes": {
-      "$ref": "./themes.json"
     }
   },
   "format": "categories"

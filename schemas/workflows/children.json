@@ -13,47 +13,17 @@
         "properties": {
           "type": "object",
           "required": [
-            "osc:project",
-            "osc:status",
-            "osc:type"
+            "osc:project"
           ],
           "properties": {
             "created": {
-              "title": "Creation Date and Time:",
-              "type": "string",
-              "format": "date-time"
-            },
-            "osc:type": {
-              "type": "string",
-              "enum": ["workflow"],
-              "options": {
-                "hidden": true
-              }
-            },
-            "osc:status": {
-              "$ref": "../collection.json#/definitions/osc_status"
+              "$ref": "../osc.json#/definitions/created"
             },
             "osc:project": {
-              "title": "Project",
-              "type": "string",
-              "format": "osc-project",
-              "minLength": 1
+              "$ref": "../osc.json#/definitions/osc:project"
             },
-            "osc:missions": {
-              "$ref": "../collection.json#/definitions/osc_missions"
-            },
-            "themes": {
-              "$ref": "../collection.json#/definitions/themes"
-            },
-            "osc:variables": {
-              "title": "Variables",
-              "format": "osc-variables",
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
+            "osc:experiments": {
+              "$ref": "../osc.json#/definitions/osc:experiments"
             }
           }
         },
