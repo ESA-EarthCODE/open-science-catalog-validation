@@ -310,9 +310,11 @@ class ValidationRun {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
     this.ensureIdIsFolderName();
 
-    this.t.equal(typeof this.data["osc:project"], 'string', `'osc:project' must be a string`);
-    await this.checkOscCrossRef(this.data["osc:project"], "projects", true); // required
-    await this.checkOscCrossRefArray(this.data, "osc:experiments", "experiments");
+    // note: osc fields are in properties, not on the top-level!
+
+    this.t.equal(typeof this.data.properties["osc:project"], 'string', `'osc:project' must be a string`);
+    await this.checkOscCrossRef(this.data.properties["osc:project"], "projects", true); // required
+    await this.checkOscCrossRefArray(this.data.properties, "osc:experiments", "experiments");
 
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
@@ -322,11 +324,13 @@ class ValidationRun {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
     this.ensureIdIsFolderName();
 
-    this.t.equal(typeof this.data["osc:workflow"], 'string', `'osc:workflow' must be a string`);
-    await this.checkOscCrossRef(this.data["osc:workflow"], "workflows", true); // required
+    // note: osc fields are in properties, not on the top-level!
 
-    this.t.equal(typeof this.data["osc:product"], 'string', `'osc:product' must be a string`);
-    await this.checkOscCrossRef(this.data["osc:product"], "products", true); // required
+    this.t.equal(typeof this.data.properties["osc:workflow"], 'string', `'osc:workflow' must be a string`);
+    await this.checkOscCrossRef(this.data.properties["osc:workflow"], "workflows", true); // required
+
+    this.t.equal(typeof this.data.properties["osc:product"], 'string', `'osc:product' must be a string`);
+    await this.checkOscCrossRef(this.data.properties["osc:product"], "products", true); // required
 
     this.hasLinkWithRel(this.data, "environment");
     this.hasLinkWithRel(this.data, "input");
@@ -466,8 +470,8 @@ class ValidationRun {
     }
   }
 
-  async checkOscCrossRefArray(data, field, type, required = false) {
-    const values = data[field];
+  async checkOscCrossRefArray(parent, field, type, required = false) {
+    const values = parent[field];
     if (required) {
       this.t.truthy(Array.isArray(values), `'${field}' must be present as an array`);
     }
@@ -480,7 +484,6 @@ class ValidationRun {
     if (!value && !required) {
       return;
     }
-    const slug = this.slugify(value);
     let filename;
     switch(type) {
       case "projects":
@@ -494,17 +497,10 @@ class ValidationRun {
       default:
         filename = "catalog";
     }
-    const filepath = this.resolve(this.folder, `../../${type}/${slug}/${filename}.json`);
+    const filepath = this.resolve(this.folder, `../../${type}/${value}/${filename}.json`);
     const exists = await await this.parent.fileExists(filepath);
     this.t.truthy(exists, `The referenced ${type} '${value}' must exist at ${filepath}`);
     await this.checkRelatedLink(this.data, type, value, filename);
-  }
-
-  slugify(value) {
-    return String(value)
-      .replace(/[^a-z0-9]+/gi, '-') // Replace all sequences of non-alphanumeric characters with a dash
-      .replace(/^-+|-+$/g, '') // Trim leading/trailing dashes
-      .toLowerCase();
   }
 
   requireTechnicalOfficer() {
