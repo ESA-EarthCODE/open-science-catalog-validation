@@ -13,8 +13,7 @@
         "properties": {
           "type": "object",
           "required": [
-            "osc:workflow",
-            "osc:product"
+            "osc:workflow"
           ],
           "properties": {
             "created": {
@@ -22,9 +21,6 @@
             },
             "osc:workflow": {
               "$ref": "../osc.json#/definitions/osc:workflow"
-            },
-            "osc:product": {
-              "$ref": "../osc.json#/definitions/osc:product"
             }
           }
         },

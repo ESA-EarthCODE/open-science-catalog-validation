@@ -11,12 +11,6 @@
       "format": "osc-project",
       "minLength": 1
     },
-    "osc:product": {
-      "title": "Product",
-      "type": "string",
-      "format": "osc-product",
-      "minLength": 1
-    },
     "osc:status": {
       "title": "Status",
       "type": "string",
