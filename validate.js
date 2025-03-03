@@ -477,6 +477,9 @@ class ValidationRun {
   async checkThemes(data) {
     this.t.truthy(Array.isArray(data.themes), `'themes' must be present as an array`);
     this.t.truthy(data.stac_extensions.includes(EXTENSION_SCHEMES.themes), `themes extension must be implemented`);
+    if (!Array.isArray(data.themes)) {
+      return;
+    }
     const theme = data.themes.find(theme => theme.scheme == THEMES_SCHEME);
     this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
     this.t.truthy(Array.isArray(theme.concepts), `concepts in themes must be present as an array`);
@@ -540,6 +543,9 @@ class ValidationRun {
   requireTechnicalOfficer() {
     // Check for technical officer information
     this.t.truthy(Array.isArray(this.data.contacts), "must have contacts");
+    if (!Array.isArray(this.data.contacts)) {
+      return;
+    }
     const contact = this.data.contacts.find(c => Array.isArray(c.roles) && c.roles.includes("technical_officer"));
     if (contact) {
       this.t.truthy(typeof contact.name === "string" && contact.name.length > 1, "must have name for technical officer");
