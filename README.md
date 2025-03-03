@@ -21,6 +21,11 @@ Example for single file validation:
 open-science-catalog-validation ./projects/3d-earth/collection.json
 ```
 
+> [!WARNING]  
+> Due to the fact that on Windows file paths are case insensitive, some checks are less strict on Windows.
+> This means in certain edge cases the validator may report validity on Windows although files are not valid.
+> It is recommended to run the validator on Linux or MacOS systems.
+
 # How it works
 This validation package is based on [stac-node-validator](https://github.com/stac-utils/stac-node-validator). Additional to generic validation following the [STAC spec](https://github.com/radiantearth/stac-spec) it does some custom validation (see [./validate.js](./validate.js)).
 
@@ -33,4 +38,3 @@ To access the schemas in a bundled format (only internal `$ref`s), use the provi
 
 # Development
 For development, copy some compatible folder structure into the root folder, then run `npm install` followed by a `npm test`.
-

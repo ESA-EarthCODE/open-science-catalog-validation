@@ -3,10 +3,10 @@ const { isObject, loadSchema } = require('stac-node-validator/src/utils.js');
 const fs = require('fs-extra');
 const path = require('path');
 const sizeOf = require('image-size');
-const Test = require('stac-node-validator/src/test.js');
 const {
   EXTENSION_SCHEMES,
   ROOT_CHILDREN,
+  RELATED_TITLE_PREFIX,
   THEMES_SCHEME
 } = require('./definitions.js');
 
@@ -71,28 +71,35 @@ class CustomValidator extends BaseValidator {
   }
 
   async bypassValidation(data, report, config) {
-    if (!Array.isArray(data.conformsTo) || !data.conformsTo.includes(RECORDS_CONFORMANCE_CLASS)) {
+    if (typeof data.stac_version !== 'undefined') {
+      // Skip this for STAC entities
       return null;
     }
+
+    const createTestFn = (fn) => async (report, test) => {
+      const run = new ValidationRun(this, data, test, report);
+
+      test.truthy(Array.isArray(data.conformsTo), 'must have a "conformsTo" array');
+      test.truthy(data.conformsTo.includes(RECORDS_CONFORMANCE_CLASS), `must conform to ${RECORDS_CONFORMANCE_CLASS}`);
+  
+      await run[fn]();
+    };
 
     await this.validateSchema(data, report, config, 'core', 'records.json');
 
     const isWorkflow = !!report.id.match(/\/workflows\/[^\/]+\/record.json/);
     const isExperiment = !!report.id.match(/\/experiments\/[^\/]+\/record.json/);
-    const test = new Test();
-    const run = new ValidationRun(this, data, test, report);
     if (isWorkflow) {
       await this.validateSchema(data, report, config, 'custom', 'workflows/children.json');
-      await run.validateWorkflow();
+      await this.testFn(report, createTestFn('validateWorkflow'));
     }
     else if (isExperiment) {
       await this.validateSchema(data, report, config, 'custom', 'experiments/children.json');
-      await run.validateExperiment();
+      await this.testFn(report, createTestFn('validateExperiment'));
     }
 
-    // If stac_version is present, continue with STAC validation additionally.
-    // Otherwise return report and abort validation.
-    return (typeof data.stac_version !== 'string') ? report : null;
+    // Return report and abort validation
+    return report;
   }
 
   getSchemaUrl(config, filepath) {
@@ -136,8 +143,7 @@ class CustomValidator extends BaseValidator {
     const isSubCatalog = !!report.id.match(/\/(eo-missions|products|projects|themes|variables|workflows|experiments)\/catalog.json/);
 
     // Ensure consistent STAC version
-    // @todo: Enable STAC 1.1.0 support once released
-    test.equal(data.stac_version, "1.0.0", `stac_version must be '1.0.0'`);
+    test.truthy(["1.0.0", "1.1.0"].includes(data.stac_version), `stac_version must be '1.0.0'`);
 
     // Ensure all catalogs and collections have a title
     test.truthy(!data.isCatalogLike() || (typeof data.title === 'string' && data.title.length > 0), "must have a title");
@@ -190,15 +196,23 @@ class ValidationRun {
     this.data = data;
     this.t = test;
     this.report = report;
-    this.folder = path.dirname(report.id);
+    this.linkPrefix = "https://esa-earthcode.github.io/open-science-catalog-metadata/";
+    this.folder = path.dirname(this.report.id);
+    const rootLink = this.getLinkWithRel(data, 'root');
+    if (rootLink) {
+      this.rootFolder = path.resolve(this.report.id, rootLink.href);
+    }
+    else {
+      this.rootFolder = path.dirname(this.folder);
+    }
   }
 
-  resolve(folder, href) {
-    const linkPrefix = "https://esa-earthcode.github.io/open-science-catalog-metadata/";
-    if (href.startsWith(linkPrefix)) {
-      href = href.slice(linkPrefix.length);
+  resolve(href, root = false) {
+    if (href.startsWith(this.linkPrefix)) {
+      href = href.slice(this.linkPrefix.length);
     }
-    return path.resolve(folder, href);
+    const basePath = root ? this.rootFolder : this.folder;
+    return path.resolve(basePath, href);
   }
 
   async validateRoot() {
@@ -209,9 +223,10 @@ class ValidationRun {
     // check parent and root
     await this.requireRootLink("./catalog.json");
     this.t.truthy(!this.getLinkWithRel(this.data, 'parent'), "must NOT have a parent");
+    this.checkStacLinksRelativeAbsolute();
 
     // check child links
-    await this.requireChildLinksForOtherJsonFiles("Catalog", ROOT_CHILDREN);
+    await this.requireChildLinksForOtherJsonFiles(ROOT_CHILDREN);
   }
 
   async validateSubCatalogs(childStacType) {
@@ -221,14 +236,15 @@ class ValidationRun {
     // check that catalog.json is parent and root
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../catalog.json");
+    this.checkStacLinksRelativeAbsolute();
 
     // check child links
     const relType = childStacType === 'Record' ? 'item' : 'child';
-    await this.requireChildLinksForOtherJsonFiles(childStacType, [], relType);
+    await this.requireChildLinksForOtherJsonFiles(null, childStacType.toLowerCase(), relType);
   }
 
   validateUserContent() {
-    // @todo: Which rules apply?
+    // todo: Which rules apply?
   }
 
   async validateEoMission() {
@@ -238,6 +254,8 @@ class ValidationRun {
     this.requireViaLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
+    await this.checkChildLinks();
+    this.checkStacLinksRelativeAbsolute();
   }
 
   async validateProduct() {
@@ -248,14 +266,14 @@ class ValidationRun {
     this.requireViaLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
+    this.checkStacLinksRelativeAbsolute(false);
 
     this.t.equal(this.data["osc:type"], "product", `'osc:type' must be 'product'`);
     this.t.equal(typeof this.data["osc:project"], 'string', `'osc:project' must be a string`);
-    if (typeof this.data["osc:project"] === 'string') {
-      await this.checkOscCrossRef(this.data["osc:project"], "projects");
-    }
+    await this.checkOscCrossRef(this.data["osc:project"], "projects", true); // required
     await this.checkOscCrossRefArray(this.data, "osc:variables", "variables");
     await this.checkOscCrossRefArray(this.data, "osc:missions", "eo-missions");
+    await this.checkOscCrossRef(this.data["osc:experiment"], "experiments");
 
     await this.checkThemes(this.data);
   }
@@ -268,13 +286,14 @@ class ValidationRun {
     this.requireViaLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
+    await this.checkChildLinks();
+    this.checkStacLinksRelativeAbsolute();
 
     this.requireTechnicalOfficer();
 
     this.t.equal(this.data["osc:type"], "project", `'osc:type' must be 'project'`);
-    this.t.truthy(typeof data['osc:project'] === 'undefined', `'osc:project' must be NOT be present`);
-    this.t.truthy(typeof data['osc:variables'] === 'undefined', `'osc:variables' must be NOT be present`);
-    this.t.truthy(typeof data['osc:missions'] === 'undefined', `'osc:missions' must be NOT be present`);
+
+    await this.checkOscCrossRefArray(this.data, "osc:workflows", "workflows");
 
     await this.checkThemes(this.data);
   }
@@ -285,6 +304,8 @@ class ValidationRun {
 
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
+    await this.checkChildLinks();
+    this.checkStacLinksRelativeAbsolute();
 
     this.checkPreviewImage();
   }
@@ -297,32 +318,47 @@ class ValidationRun {
     this.requireViaLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
+    await this.checkChildLinks();
+    this.checkStacLinksRelativeAbsolute();
 
     await this.checkThemes(this.data);
   }
 
   async validateWorkflow() {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
-    this.hasExtensions(["themes"]);
     this.ensureIdIsFolderName();
 
-    // TODO add support for relative links
-    // TODO Extend workflow validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
-    // this.requireDataLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
+    await this.checkChildLinks("experiments", "record");
+    this.checkStacLinksRelativeAbsolute(false);
+
+    // note: osc fields are in properties, not on the top-level!
+    this.t.equal(typeof this.data.properties["osc:project"], 'string', `'osc:project' must be a string`);
+    await this.checkOscCrossRef(this.data.properties["osc:project"], "projects", true); // required
   }
 
   async validateExperiment() {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
-    this.hasExtensions(["themes"]);
     this.ensureIdIsFolderName();
 
-    //TODO add support for relative links
-    // TODO Extend experiment validation (see https://github.com/ESA-EarthCODE/open-science-catalog-validation/pull/12#issuecomment-2610426543)
-    // this.requireDataLink();
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
+    await this.checkChildLinks();
+    this.checkStacLinksRelativeAbsolute(false);
+
+    // note: osc fields are in properties, not on the top-level!
+    this.t.equal(typeof this.data.properties["osc:workflow"], 'string', `'osc:workflow' must be a string`);
+    await this.checkOscCrossRef(this.data.properties["osc:workflow"], "workflows", true); // required
+
+    this.hasLinkWithRel(this.data, "environment");
+    this.hasLinkWithRel(this.data, "input");
+  }
+
+  hasLinkWithRel(data, rel) {
+    const link = this.getLinkWithRel(data, rel);
+    this.t.truthy(isObject(link), `must have ${rel} link`);
+    return link;
   }
 
   hasExtensions(extensions) {
@@ -338,15 +374,14 @@ class ValidationRun {
 
   checkPreviewImage() {
     // Check that the theme has a preview image with valid properties and that the file exists
-    const link = this.getLinkWithRel(this.data, "preview");
-    this.t.truthy(isObject(link), "must have 'preview' link");
-    if (!isObject(link)) {
+    const link = this.hasLinkWithRel(this.data, "preview");
+    if (!link) {
       return;
     }
     this.t.equal(link.type, "image/webp");
     this.t.equal(link["proj:epsg"], null);
 
-    const previewPath = this.resolve(this.folder, link.href);
+    const previewPath = this.resolve(link.href);
 
     try {
       const dimensions = sizeOf(previewPath);
@@ -362,65 +397,85 @@ class ValidationRun {
   }
 
   // check that all files are linked to as child links and that all child links exist
-  async requireChildLinksForOtherJsonFiles(type, files = [], linkRel = 'child', fileExt = 'json', linkType = 'application/json') {
-    if(files.length === 0) {
+  async checkChildLinks(expectedType = "products", expectedFilename = "collection") {
+    const links = this.data.links.filter(link => link.rel === "child");
+    for(const link of links) {
+      this.t.equal(link.type, 'application/json', `Link with relation 'child' to ${link.href} must be of type 'application/json'`);
+      const type = path.basename(path.dirname(path.dirname(link.href)));
+      const filename = path.basename(link.href);
+      this.t.equal(type, expectedType, `Link with relation 'child' to ${link.href} must point to a file in folder '${expectedType}'`);
+      this.t.equal(filename, expectedFilename + ".json", `Link with relation 'child' to ${link.href} must point to a file with name '${expectedFilename}.json'`);
+      await this.checkLinkTitle(link);
+    }
+
+    const linkHrefs = links.map(link => this.resolve(link.href));
+    const fileChecks = await Promise.all(linkHrefs.map(async (x) => await this.parent.fileExists(x)));
+    for (let i = 0; i < linkHrefs.length; i++) {
+      this.t.truthy(fileChecks[i], `must have file for link ${linkHrefs[i]} with relation 'child'`);
+    }
+  }
+
+  // check that all files are linked to as child links and that all child links exist
+  async requireChildLinksForOtherJsonFiles(files = null, filename = "collection", linkRel = 'child') {
+    if (Array.isArray(files)) {
+      files = files.map(file => this.resolve(file));
+    }
+    else {
+      files = [];
       const dir = await fs.opendir(this.folder);
       for await (const file of dir) {
         if (file.isDirectory()) {
-          if (type) {
-            const filename = type.toLowerCase();
-            const filepath = path.normalize(`${this.folder}/${file.name}/${filename}.${fileExt}`);
-            files.push(filepath);
+          if (filename) {
+            files.push(`${this.folder}/${file.name}/${filename}.json`);
           }
           else {
             const subfolder = `${this.folder}/${file.name}`;
             const subdir = await fs.opendir(subfolder);
             for await (const file of subdir) {
-              if (file.name.endsWith(`.${fileExt}`)) {
-                const filepath = path.normalize(`${subfolder}/${file.name}`);
-                files.push(filepath);
+              if (file.name.endsWith(`.json`)) {
+                files.push(`${subfolder}/${file.name}`);
               }
             }
           }
         }
       }
     }
-    else {
-      files = files.map(file => this.resolve(this.folder, file));
-    }
+    files = files.map(file => this.resolve(file));
 
-    const links = this.data.getLinksWithRels([linkRel]);
+    const links = this.data.links.filter(link => link.href && link.rel === linkRel);
     for(const link of links) {
-      this.t.equal(link.type, linkType, `Link with relation ${linkRel} to ${link.href} must be of type ${linkType}`);
-      if (link.href.endsWith('.json')) {
-        await this.checkLinkTitle(link, this.folder);
-      }
+      this.t.equal(link.type, 'application/json', `Link with relation ${linkRel} to ${link.href} must be of type 'application/json'`);
+      await this.checkLinkTitle(link);
     }
 
-    const linkHrefs = links.map(link => this.resolve(this.folder, link.href));
+    const linkHrefs = links.map(link => this.resolve(link.href));
 
-    let missingChilds = files.filter(x => !linkHrefs.includes(x));
+    const missingChilds = files.filter(x => !linkHrefs.includes(x));
     for(const file of missingChilds) {
       this.t.fail(`must have link with relation ${linkRel} to ${file}`);
     }
 
-    let missingFiles = linkHrefs.filter(x => !files.includes(x));
+    const missingFiles = linkHrefs.filter(x => !files.includes(x));
     for(const file of missingFiles) {
       this.t.fail(`must have file for link ${file} with relation ${linkRel}`);
     }
   }
 
-  async checkLinkTitle(link) {
-    const href = this.resolve(this.folder, link.href);
+  async checkLinkTitle(link, prefix = '') {
+    const href = this.resolve(link.href);
     const title = await this.parent.getTitleForFile(href);
     if (typeof title === "string") {
-      this.t.equal(link.title, title, `Title of link to ${link.href} is not the title of the linked file ${href}`);
+      if (prefix) {
+        this.t.equal(link.title, prefix + title, `Title of link to ${link.href} (rel: ${link.rel}) must be '${prefix + title}'`);
+      }
+      else {
+        this.t.equal(link.title, title, `Title of link to ${link.href} (rel: ${link.rel}) is not the title of the linked file ${href}`);
+      }
     }
   }
 
   async checkThemes(data) {
     this.t.truthy(Array.isArray(data.themes), `'themes' must be present as an array`);
-    this.t.truthy(typeof data['osc:themes'] === 'undefined', `'osc:themes' must be NOT be present any longer`);
     this.t.truthy(data.stac_extensions.includes(EXTENSION_SCHEMES.themes), `themes extension must be implemented`);
     const theme = data.themes.find(theme => theme.scheme == THEMES_SCHEME);
     this.t.truthy(theme, `must have theme with scheme '${THEMES_SCHEME}'`);
@@ -428,42 +483,58 @@ class ValidationRun {
     // Check cross references (i.e. whether given theme has a catalog in /themes/)
     if (Array.isArray(theme.concepts)) {
       await Promise.all(theme.concepts.map(async (obj) => {
-        const filepath = this.resolve(this.folder, `../../themes/${obj.id}/catalog.json`);
+        const filepath = this.resolve(`../../themes/${obj.id}/catalog.json`);
         const exists = await this.parent.fileExists(filepath);
         this.t.truthy(exists, `The referenced theme '${obj.id}' must exist at ${filepath}`);
       }));
       this.t.truthy(Array.isArray(data.links), `'links' must be present as an array`);
-      theme.concepts.forEach((obj) => {
-        const link = data.links.find(link => link.rel === "related" && link.href.endsWith(`/themes/${obj.id}/catalog.json`));
-        this.t.truthy(link, `must have a 'related' link to the theme '${obj.id}'`);
-        if (link) {
-          this.t.truthy(link.type === "application/json", `type of 'related' link to the theme '${obj.id}' must be 'application/json'`);
-        }
-      });
+      await Promise.all(theme.concepts.map(async (obj) => await this.checkRelatedLink(data, "themes", obj.id, "catalog")));
     }
   }
 
-  async checkOscCrossRefArray(data, field, type) {
-    const values = data[field];
-    this.t.truthy(Array.isArray(values), `'${field}' must be present as an array`);
+  async checkRelatedLink(data, type, id, file = "collection") {
+    const link = data.links.find(link => link.rel === "related" && link.href.endsWith(`/${type}/${id}/${file}.json`));
+    this.t.truthy(link, `must have a 'related' link to ${type} with id '${id}'`);
+    if (link) {
+      this.t.truthy(link.type === "application/json", `type of 'related' link to ${type} with id '${id}' must be 'application/json'`);
+      const prefix = RELATED_TITLE_PREFIX[type] + ': ';
+      this.checkLinkTitle(link, prefix);
+      const folder = path.basename(path.dirname(path.dirname(link.href)));
+      this.t.truthy(folder !== 'products', `products should be 'child' links, not 'related' links`);
+    }
+  }
+
+  async checkOscCrossRefArray(parent, field, type, required = false) {
+    const values = parent[field];
+    if (required) {
+      this.t.truthy(Array.isArray(values), `'${field}' must be present as an array`);
+    }
     if (Array.isArray(values)) {
-      await Promise.all(values.map(value => this.checkOscCrossRef(value, type)));
+      await Promise.all(values.map(value => this.checkOscCrossRef(value, type, true)));
     }
   }
 
-  async checkOscCrossRef(value, type) {
-    const slug = this.slugify(value);
-    const filename = ['products', 'projects'].includes(type) ? 'collection' : 'catalog';
-    const filepath = this.resolve(this.folder, `../../${type}/${slug}/${filename}.json`);
-    const exists = await await this.parent.fileExists(filepath);
+  async checkOscCrossRef(value, type, required = false) {
+    if (!value && !required) {
+      return;
+    }
+    let filename;
+    switch(type) {
+      case "projects":
+      case "products":
+        filename = "collection";
+        break;
+      case "experiments":
+      case "workflows":
+        filename = "record";
+        break;
+      default:
+        filename = "catalog";
+    }
+    const filepath = this.resolve(`../../${type}/${value}/${filename}.json`);
+    const exists = await this.parent.fileExists(filepath);
     this.t.truthy(exists, `The referenced ${type} '${value}' must exist at ${filepath}`);
-  }
-
-  slugify(value) {
-    return String(value)
-      .replace(/[^a-z0-9]+/gi, '-') // Replace all sequences of non-alphanumeric characters with a dash
-      .replace(/^-+|-+$/g, '') // Trim leading/trailing dashes
-      .toLowerCase();
+    await this.checkRelatedLink(this.data, type, value, filename);
   }
 
   requireTechnicalOfficer() {
@@ -481,11 +552,6 @@ class ValidationRun {
     }
   }
 
-  disallowRelatedLinks() {
-    const link = this.getLinkWithRel(this.data, 'related');
-    this.t.truthy(!link, `must NOT have a 'related' link`);
-  }
-
   async requireParentLink(path) {
     await this.checkStacLink('parent', path);
   }
@@ -501,24 +567,36 @@ class ValidationRun {
     return data.links.find(link => link.href && link.rel === rel) || null;
   }
 
+  checkStacLinksRelativeAbsolute(includeItemChild = true) {
+    const relativeRelTypes = ['related', 'parent'];
+    if (includeItemChild) {
+      relativeRelTypes.push('item');
+      relativeRelTypes.push('child');
+    }
+    for(let link of this.data.links) {
+      if (link.rel === 'self') {
+        this.t.truthy(link.href.startsWith(this.linkPrefix), `Link with rel '${link.rel}' to '${link.href}' must start with '${this.linkPrefix}'`);
+      }
+      else if (relativeRelTypes.includes(link.rel)) {
+        this.t.truthy(!link.href.includes('://'), `Link with rel '${link.rel}' to '${link.href}' must be relative`)
+        return ;
+      }
+    }
+  }
+
   async checkStacLink(type, expectedPath) {
-    const link = this.getLinkWithRel(this.data, type);
-    this.t.truthy(isObject(link), `must have ${type} link`);
-    if (!isObject(link)) {
+    const link = this.hasLinkWithRel(this.data, type);
+    if (!link) {
       return;
     }
-    // @todo: make more robust and make it work with absolute links
-    this.t.equal(link.href, expectedPath, `${type} link must point to ${expectedPath}`);
+    this.t.equal(this.resolve(link.href), this.resolve(expectedPath), `${type} link must point to ${expectedPath}`);
     this.t.equal(link.type, "application/json", `${type} link type must be of type application/json`);
 
     await this.checkLinkTitle(link);
   }
 
   requireViaLink() {
-    const link = this.getLinkWithRel(this.data, "via");
-    this.t.truthy(isObject(link), "must have 'via' link");
-    // @todo: enable if we can ensure that all links have a HTML media type
-    // this.test.equal(link.type, "text/html", "via link type must be of type text/html");
+    this.hasLinkWithRel(this.data, "via");
   }
 
 }

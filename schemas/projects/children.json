@@ -19,13 +19,13 @@
           }
         },
         "osc:status": {
-          "$ref": "../collection.json#/definitions/osc_status"
+          "$ref": "../osc.json#/definitions/osc:status"
         },
-        "osc:region": {
-          "$ref": "../collection.json#/definitions/osc_region"
+        "osc:workflows": {
+          "$ref": "../osc.json#/definitions/osc:workflows"
         },
         "themes": {
-          "$ref": "../collection.json#/definitions/themes"
+          "$ref": "../themes.json"
         },
         "contacts": {
           "options": {
