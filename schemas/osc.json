@@ -55,13 +55,6 @@
       "type": "string",
       "minLength": 1
     },
-    "osc:experiments": {
-      "title": "Experiments",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/osc:experiment"
-      }
-    },
     "osc:workflow": {
       "title": "Workflow",
       "type": "string",

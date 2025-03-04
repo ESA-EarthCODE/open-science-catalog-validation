@@ -21,9 +21,6 @@
             },
             "osc:project": {
               "$ref": "../osc.json#/definitions/osc:project"
-            },
-            "osc:experiments": {
-              "$ref": "../osc.json#/definitions/osc:experiments"
             }
           }
         },
