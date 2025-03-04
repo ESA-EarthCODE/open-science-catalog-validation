@@ -16,18 +16,15 @@
             "osc:workflow"
           ],
           "properties": {
-            "created": {
-              "$ref": "../osc.json#/definitions/created"
-            },
             "osc:workflow": {
               "$ref": "../osc.json#/definitions/osc:workflow"
             }
           }
-        },
-        "links": {
-          "$ref": "../catalog.json#/definitions/links_root_parent_child_related_via_input_environment_other"
         }
       }
+    },
+    {
+      "$ref": "../catalog.json#/definitions/links_root_parent_child_related_via_input_environment_other"
     }
   ]
 }

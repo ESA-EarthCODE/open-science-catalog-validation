@@ -280,9 +280,7 @@
       "type": "object",
       "properties": {
         "created": {
-          "type": "string",
-          "description": "The date this record was created in the server.",
-          "format": "date-time"
+          "$ref": "../osc.json#/definitions/created"
         },
         "updated": {
           "type": "string",
@@ -643,52 +641,18 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": [
+          "href"
+        ],
+        "properties": {
+          "href": {
+            "type": "string",
+            "format": "uri-reference"
+          }
+        },
         "allOf": [
           {
-            "type": "object",
-            "properties": {
-              "rel": {
-                "type": "string",
-                "description": "The type or semantics of the relation."
-              },
-              "type": {
-                "type": "string",
-                "description": "A hint indicating what the media type of the result of dereferencing the link should be."
-              },
-              "hreflang": {
-                "type": "string",
-                "description": "A hint indicating what the language of the result of dereferencing the link should be."
-              },
-              "title": {
-                "type": "string",
-                "description": "Used to label the destination of a link such that it can be used as a human-readable identifier."
-              },
-              "length": {
-                "type": "integer"
-              },
-              "created": {
-                "type": "string",
-                "description": "Date of creation of the resource pointed to by the link.",
-                "format": "date-time"
-              },
-              "updated": {
-                "type": "string",
-                "description": "Most recent date on which the resource pointed to by the link was changed.",
-                "format": "date-time"
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "href"
-            ],
-            "properties": {
-              "href": {
-                "type": "string",
-                "format": "uri-reference"
-              }
-            }
+            "$ref": "#/$defs/baselink"
           }
         ]
       }
@@ -696,32 +660,66 @@
     "linkTemplates": {
       "type": "array",
       "items": {
+        "type": "object",
+        "required": [
+          "uriTemplate"
+        ],
+        "properties": {
+          "uriTemplate": {
+            "type": "string",
+            "description": "Supplies a resolvable URI to a remote resource (or resource fragment)."
+          },
+          "varBase": {
+            "type": "string",
+            "description": "The base URI to which the variable name can be appended to retrieve the definition of the variable as a JSON Schema fragment.",
+            "format": "uri"
+          },
+          "variables": {
+            "type": "object",
+            "description": "This object contains one key per substitution variable in the templated URL.  Each key defines the schema of one substitution variable using a JSON Schema fragment and can thus include things like the data type of the variable, enumerations, minimum values, maximum values, etc."
+          }
+        },
         "allOf": [
           {
-            "$ref": "#/properties/links/items/allOf/0"
-          },
-          {
-            "type": "object",
-            "required": [
-              "uriTemplate"
-            ],
-            "properties": {
-              "uriTemplate": {
-                "type": "string",
-                "description": "Supplies a resolvable URI to a remote resource (or resource fragment)."
-              },
-              "varBase": {
-                "type": "string",
-                "description": "The base URI to which the variable name can be appended to retrieve the definition of the variable as a JSON Schema fragment.",
-                "format": "uri"
-              },
-              "variables": {
-                "type": "object",
-                "description": "This object contains one key per substitution variable in the templated URL.  Each key defines the schema of one substitution variable using a JSON Schema fragment and can thus include things like the data type of the variable, enumerations, minimum values, maximum values, etc."
-              }
-            }
+            "$ref": "#/$defs/baselink"
           }
         ]
+      }
+    }
+  },
+  "$defs": {
+    "baselink": {
+      "type": "object",
+      "properties": {
+        "rel": {
+          "type": "string",
+          "description": "The type or semantics of the relation."
+        },
+        "type": {
+          "type": "string",
+          "description": "A hint indicating what the media type of the result of dereferencing the link should be."
+        },
+        "hreflang": {
+          "type": "string",
+          "description": "A hint indicating what the language of the result of dereferencing the link should be."
+        },
+        "title": {
+          "type": "string",
+          "description": "Used to label the destination of a link such that it can be used as a human-readable identifier."
+        },
+        "length": {
+          "type": "integer"
+        },
+        "created": {
+          "type": "string",
+          "description": "Date of creation of the resource pointed to by the link.",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "description": "Most recent date on which the resource pointed to by the link was changed.",
+          "format": "date-time"
+        }
       }
     }
   }

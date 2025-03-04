@@ -319,7 +319,7 @@
       }
     },
     "stac_link_root": {
-      "title": "STAC Root Link",
+      "title": "Root Link",
       "properties": {
         "href": {
           "readOnly": true
@@ -342,7 +342,7 @@
       }
     },
     "stac_link_parent": {
-      "title": "STAC Parent Link",
+      "title": "Parent Link",
       "properties": {
         "href": {
           "readOnly": true
@@ -376,7 +376,7 @@
       ]
     },
     "stac_link_child": {
-      "title": "STAC Child Link",
+      "title": "Child Link",
       "properties": {
         "type": {
           "enum": ["application/json"],
@@ -393,7 +393,7 @@
       }
     },
     "stac_link_item": {
-      "title": "STAC Item/Record Link",
+      "title": "Item/Record Link",
       "properties": {
         "type": {
           "enum": ["application/json"],
@@ -410,7 +410,7 @@
       }
     },
     "stac_link_related": {
-      "title": "STAC Related Link",
+      "title": "Related Link",
       "properties": {
         "type": {
           "enum": ["application/json"],
@@ -427,7 +427,7 @@
       }
     },
     "stac_link_self": {
-      "title": "STAC Self Link",
+      "title": "Self Link",
       "properties": {
         "href": {
           "readOnly": true

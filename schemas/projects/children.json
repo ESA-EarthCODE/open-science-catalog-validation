@@ -82,11 +82,11 @@
               }
             }
           ]
-        },
-        "links": {
-          "$ref": "../catalog.json#/definitions/links_root_parent_via_other"
         }
       }
+    },
+    {
+      "$ref": "../catalog.json#/definitions/links_root_parent_via_other"
     }
   ]
 }
