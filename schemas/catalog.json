@@ -152,7 +152,20 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/other_links"
+                "title": "Other Link",
+                "properties": {
+                  "rel": {
+                    "not": {
+                      "enum": [
+                        "root",
+                        "parent",
+                        "child",
+                        "related",
+                        "via"
+                      ]
+                    }
+                  }
+                }
               },
               {
                 "$ref": "#/definitions/stac_link_root"
@@ -180,7 +193,22 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/other_links"
+                "title": "Other Link",
+                "properties": {
+                  "rel": {
+                    "not": {
+                      "enum": [
+                        "root",
+                        "parent",
+                        "child",
+                        "related",
+                        "via",
+                        "input",
+                        "environment"
+                      ]
+                    }
+                  }
+                }
               },
               {
                 "$ref": "#/definitions/stac_link_root"
@@ -224,13 +252,96 @@
         }
       }
     },
+    "links_root_parent_child_via_preview": {
+      "properties": {
+        "links": {
+          "items": {
+            "oneOf": [
+              {
+                "title": "Other Link",
+                "properties": {
+                  "rel": {
+                    "not": {
+                      "enum": [
+                        "root",
+                        "parent",
+                        "child",
+                        "via",
+                        "preview"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "$ref": "#/definitions/stac_link_root"
+              },
+              {
+                "$ref": "#/definitions/stac_link_parent"
+              },
+              {
+                "$ref": "#/definitions/via_links"
+              },
+              {
+                "$ref": "#/definitions/stac_link_child"
+              },
+              {
+                "title": "Preview Image Link",
+                "properties": {
+                  "href": {
+                    "readOnly": true
+                  },
+                  "type": {
+                    "readOnly": true
+                  },
+                  "rel": {
+                    "enum": ["preview"]
+                  },
+                  "proj:epsg": {
+                    "title": "EPSG Code",
+                    "enum": [
+                      null
+                    ],
+                    "options": {
+                      "hidden": true
+                    }
+                  },
+                  "proj:shape": {
+                    "title": "EPSG Code",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "options": {
+                      "hidden": true
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
     "links_root_parent_child_via_other": {
       "properties": {
         "links": {
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/other_links"
+                "title": "Other Link",
+                "properties": {
+                  "rel": {
+                    "not": {
+                      "enum": [
+                        "root",
+                        "parent",
+                        "child",
+                        "via"
+                      ]
+                    }
+                  }
+                }
               },
               {
                 "$ref": "#/definitions/stac_link_root"
@@ -240,31 +351,6 @@
               },
               {
                 "$ref": "#/definitions/stac_link_child"
-              },
-              {
-                "$ref": "#/definitions/via_links"
-              }
-            ]
-          }
-        }
-      }
-    },
-    "links_root_parent_via_other": {
-      "properties": {
-        "links": {
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/other_links"
-              },
-              {
-                "$ref": "#/definitions/stac_link_root"
-              },
-              {
-                "$ref": "#/definitions/stac_link_parent"
-              },
-              {
-                "$ref": "#/definitions/stac_link_self"
               },
               {
                 "$ref": "#/definitions/via_links"
@@ -319,7 +405,7 @@
       }
     },
     "stac_link_root": {
-      "title": "STAC Root Link",
+      "title": "Root Link",
       "properties": {
         "href": {
           "readOnly": true
@@ -342,7 +428,7 @@
       }
     },
     "stac_link_parent": {
-      "title": "STAC Parent Link",
+      "title": "Parent Link",
       "properties": {
         "href": {
           "readOnly": true
@@ -376,7 +462,7 @@
       ]
     },
     "stac_link_child": {
-      "title": "STAC Child Link",
+      "title": "Child Link",
       "properties": {
         "type": {
           "enum": ["application/json"],
@@ -393,7 +479,7 @@
       }
     },
     "stac_link_item": {
-      "title": "STAC Item/Record Link",
+      "title": "Item/Record Link",
       "properties": {
         "type": {
           "enum": ["application/json"],
@@ -410,7 +496,7 @@
       }
     },
     "stac_link_related": {
-      "title": "STAC Related Link",
+      "title": "Related Link",
       "properties": {
         "type": {
           "enum": ["application/json"],
@@ -427,7 +513,7 @@
       }
     },
     "stac_link_self": {
-      "title": "STAC Self Link",
+      "title": "Self Link",
       "properties": {
         "href": {
           "readOnly": true
@@ -472,21 +558,6 @@
           "enum": ["via"],
           "options": {
             "hidden": true
-          }
-        }
-      }
-    },
-    "other_links": {
-      "title": "Other Link",
-      "properties": {
-        "rel": {
-          "not": {
-            "enum": [
-              "root",
-              "parent",
-              "child",
-              "via"
-            ]
           }
         }
       }

@@ -5,7 +5,7 @@
       "$ref": "../catalog.json"
     },
     {
-      "$ref": "../catalog.json#/definitions/links_root_parent_child_via_other"
+      "$ref": "../catalog.json#/definitions/links_root_parent_child_related_via_other"
     },
     {
       "required": [
