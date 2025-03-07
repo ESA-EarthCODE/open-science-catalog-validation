@@ -16,19 +16,15 @@
             "osc:project"
           ],
           "properties": {
-            "created": {
-              "$ref": "../osc.json#/definitions/created"
-            },
             "osc:project": {
               "$ref": "../osc.json#/definitions/osc:project"
             }
           }
-        },
-        "links": {
-          "$ref": "../catalog.json#/definitions/links_root_parent_child_related_via_other"
         }
-      },
-      "additionalProperties": true
+      }
+    },
+    {
+      "$ref": "../catalog.json#/definitions/links_root_parent_child_related_via_other"
     }
   ]
 }
