@@ -34,7 +34,8 @@
       "$ref": "catalog.json#/definitions/description"
     },
     "keywords": {
-      "$ref": "#/definitions/keywords"
+      "$ref": "#/definitions/keywords",
+      "propertyOrder": 10
     },
     "license": {
       "$ref": "license.json"

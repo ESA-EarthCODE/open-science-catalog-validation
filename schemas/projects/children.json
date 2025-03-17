@@ -11,6 +11,9 @@
         "osc:type"
       ],
       "properties": {
+        "updated": {
+          "$ref": "../osc.json#/definitions/updated"
+        },
         "osc:type": {
           "type": "string",
           "enum": ["project"],
@@ -25,7 +28,8 @@
           "$ref": "../osc.json#/definitions/osc:workflows"
         },
         "themes": {
-          "$ref": "../themes.json"
+          "$ref": "../themes.json",
+          "propertyOrder": 50
         },
         "contacts": {
           "options": {
