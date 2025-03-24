@@ -544,11 +544,17 @@
           }
         },
         "created": {
+          "type": "string",
+          "description": "Date of creation of the resource pointed to by the link.",
+          "format": "date-time",
           "options": {
             "hidden": true
           }
         },
         "updated": {
+          "type": "string",
+          "description": "Most recent date on which the resource pointed to by the link was changed.",
+          "format": "date-time",
           "options": {
             "hidden": true
           }
