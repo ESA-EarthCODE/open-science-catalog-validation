@@ -278,13 +278,12 @@
       }
     },
     "conformsTo": {
+      "title": "Conformance classes",
       "type": "array",
       "description": "The extensions/conformance classes used in this record.",
       "items": {
+        "title": "Conformance class",
         "type": "string"
-      },
-      "options": {
-        "hidden": true
       }
     },
     "properties": {
