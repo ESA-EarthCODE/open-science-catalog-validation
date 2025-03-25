@@ -32,7 +32,8 @@
       "$ref": "#/definitions/description"
     },
     "links": {
-      "$ref": "#/definitions/links"
+      "$ref": "#/definitions/links",
+      "propertyOrder": 1007
     }
   },
   "definitions": {
@@ -78,10 +79,6 @@
     "links": {
       "title": "Links",
       "type": "array",
-      "options": {
-        "collapsed": true,
-        "disable_collapse": false
-      },
       "items": {
         "$ref": "#/definitions/link"
       }
@@ -106,7 +103,7 @@
           "minLength": 1
         },
         "type": {
-          "title": "File Format",
+          "title": "Media Type",
           "description": "The media type of the linked resource.",
           "type": "string"
         },

@@ -1,6 +1,5 @@
 {
   "title": "EOEPCA metadata profile",
-  "description": "Customized EOEPCA metadata profile for OSC",
   "type": "object",
   "required": [
     "id",
@@ -20,7 +19,10 @@
       "type": "string",
       "enum": [
         "Feature"
-      ]
+      ],
+      "options": {
+        "hidden": true
+      }
     },
     "time": {
       "oneOf": [
@@ -70,7 +72,10 @@
             }
           }
         }
-      ]
+      ],
+      "options": {
+        "hidden": true
+      }
     },
     "geometry": {
       "oneOf": [
@@ -267,25 +272,29 @@
             }
           ]
         }
-      ]
+      ],
+      "options": {
+        "hidden": true
+      }
     },
     "conformsTo": {
+      "title": "Conformance classes",
       "type": "array",
       "description": "The extensions/conformance classes used in this record.",
       "items": {
+        "title": "Conformance class",
         "type": "string"
       }
     },
     "properties": {
       "type": "object",
+      "format": "categories",
       "properties": {
         "created": {
           "$ref": "./osc.json#/definitions/created"
         },
         "updated": {
-          "type": "string",
-          "description": "The most recent date on which the record was changed.",
-          "format": "date-time"
+          "$ref": "./osc.json#/definitions/updated"
         },
         "type": {
           "type": "string",
@@ -296,29 +305,33 @@
             "process",
             "workflow",
             "experiment"
-          ]
-        },
-        "title": {
-          "type": "string",
-          "description": "A human-readable name given to the resource."
-        },
-        "description": {
-          "type": "string",
-          "description": "A free-text account of the resource."
-        },
-        "keywords": {
-          "type": "array",
-          "description": "The topic or topics of the resource. Typically represented using free-form keywords, tags, key phrases, or classification codes.",
-          "items": {
-            "type": "string"
+          ],
+          "options": {
+            "hidden": true
           }
         },
+        "title": {
+          "$ref": "./catalog.json#/definitions/title",
+          "propertyOrder": 1
+        },
+        "description": {
+          "$ref": "./catalog.json#/definitions/description",
+          "propertyOrder": 2
+        },
+        "keywords": {
+          "$ref": "./collection.json#/definitions/keywords",
+          "propertyOrder": 10
+        },
         "themes": {
-          "$ref": "./themes.json"
+          "$ref": "./themes.json",
+          "propertyOrder": 50
         },
         "language": {
           "description": "The language used for textual values in this record representation.",
-          "$ref": "#/properties/properties/properties/languages/items"
+          "$ref": "#/properties/properties/properties/languages/items",
+          "options": {
+            "hidden": true
+          }
         },
         "languages": {
           "type": "array",
@@ -355,6 +368,9 @@
                 "default": "ltr"
               }
             }
+          },
+          "options": {
+            "hidden": true
           }
         },
         "resourceLanguages": {
@@ -362,19 +378,25 @@
           "description": "The list of languages in which the resource described by this record is available.",
           "items": {
             "$ref": "#/properties/properties/properties/languages/items"
+          },
+          "options": {
+            "hidden": true
           }
         },
         "externalIds": {
+          "title": "External IDs",
           "type": "array",
           "description": "An identifier for the resource assigned by an external (to the catalog) entity.",
           "items": {
             "type": "object",
             "properties": {
               "scheme": {
+                "title": "Scheme",
                 "type": "string",
                 "description": "A reference to an authority or identifier for a knowledge organization system from which the external identifier was obtained. It is recommended that the identifier be a resolvable URI."
               },
               "value": {
+                "title": "Value",
                 "type": "string",
                 "description": "The value of the identifier."
               }
@@ -385,8 +407,8 @@
           }
         },
         "formats": {
+          "title": "Formats",
           "type": "array",
-          "description": "A list of available distributions of the resource.",
           "items": {
             "type": "object",
             "anyOf": [
@@ -403,198 +425,39 @@
             ],
             "properties": {
               "name": {
+                "title": "Name",
                 "type": "string"
               },
               "mediaType": {
+                "title": "Media Type",
                 "type": "string"
               }
             }
           }
         },
         "contacts": {
-          "type": "array",
-          "description": "A list of contacts qualified by their role(s) in association to the record or the resource described by the record.",
-          "items": {
-            "type": "object",
-            "description": "Identification of, and means of communication with, person responsible\nfor the resource.",
-            "anyOf": [
-              {
-                "required": [
-                  "name"
-                ]
-              },
-              {
-                "required": [
-                  "organization"
-                ]
-              }
-            ],
-            "properties": {
-              "identifier": {
-                "type": "string",
-                "description": "A value uniquely identifying a contact."
-              },
-              "name": {
-                "type": "string",
-                "description": "The name of the responsible person."
-              },
-              "position": {
-                "type": "string",
-                "description": "The name of the role or position of the responsible person taken from the organization's formal organizational hierarchy or chart."
-              },
-              "organization": {
-                "type": "string",
-                "description": "Organization/affiliation of the contact."
-              },
-              "logo": {
-                "description": "Graphic identifying a contact. The link relation should be `icon` and the media type should be an image media type.",
-                "allOf": [
-                  {
-                    "$ref": "#/properties/links/items"
-                  },
-                  {
-                    "type": "object",
-                    "required": [
-                      "rel",
-                      "type"
-                    ],
-                    "properties": {
-                      "rel": {
-                        "enum": [
-                          "icon"
-                        ]
-                      }
-                    }
-                  }
-                ]
-              },
-              "phones": {
-                "type": "array",
-                "description": "Telephone numbers at which contact can be made.",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "value"
-                  ],
-                  "properties": {
-                    "value": {
-                      "type": "string",
-                      "description": "The value is the phone number itself.",
-                      "pattern": "^\\+[1-9]{1}[0-9]{3,14}$"
-                    },
-                    "roles": {
-                      "description": "The type of phone number (e.g. home, work, fax, etc.).",
-                      "$ref": "#/properties/properties/properties/contacts/items/properties/roles"
-                    }
-                  }
-                }
-              },
-              "emails": {
-                "type": "array",
-                "description": "Email addresses at which contact can be made.",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "value"
-                  ],
-                  "properties": {
-                    "value": {
-                      "type": "string",
-                      "description": "The value is the email number itself.",
-                      "format": "email"
-                    },
-                    "roles": {
-                      "description": "The type of email (e.g. home, work, etc.).",
-                      "$ref": "#/properties/properties/properties/contacts/items/properties/roles"
-                    }
-                  }
-                }
-              },
-              "addresses": {
-                "type": "array",
-                "description": "Physical location at which contact can be made.",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "deliveryPoint": {
-                      "type": "array",
-                      "description": "Address lines for the location.",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "city": {
-                      "type": "string",
-                      "description": "City for the location."
-                    },
-                    "administrativeArea": {
-                      "type": "string",
-                      "description": "State or province of the location."
-                    },
-                    "postalCode": {
-                      "type": "string",
-                      "description": "ZIP or other postal code."
-                    },
-                    "country": {
-                      "type": "string",
-                      "description": "Country of the physical address.  ISO 3166-1 is recommended."
-                    },
-                    "roles": {
-                      "description": "The type of address (e.g. office, home, etc.).",
-                      "$ref": "#/properties/properties/properties/contacts/items/properties/roles"
-                    }
-                  }
-                }
-              },
-              "links": {
-                "type": "array",
-                "description": "On-line information about the contact.",
-                "items": {
-                  "allOf": [
-                    {
-                      "$ref": "#/properties/links/items"
-                    },
-                    {
-                      "type": "object",
-                      "required": [
-                        "type"
-                      ]
-                    }
-                  ]
-                }
-              },
-              "hoursOfService": {
-                "type": "string",
-                "description": "Time period when the contact can be contacted."
-              },
-              "contactInstructions": {
-                "type": "string",
-                "description": "Supplemental instructions on how or when to contact the\nresponsible party."
-              },
-              "roles": {
-                "description": "The set of named duties, job functions and/or permissions associated with this contact. (e.g. developer, administrator, etc.).",
-                "type": "array",
-                "minItems": 1,
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
+          "$ref": "contacts.json"
         },
         "license": {
-          "type": "string",
-          "description": "A legal document under which the resource is made available. If the resource is being made available under a common license then use an SPDX license id (https://spdx.org/licenses/). If the resource is being made available under multiple common licenses then use an SPDX license expression v2.3 string (https://spdx.github.io/spdx-spec/v2.3/SPDX-license-expressions/) If the resource is being made available under one or more licenses that haven't been assigned an SPDX identifier or one or more custom licenses then use a string value of 'other' and include one or more links (rel=\"license\") in the `link` section of the record to the file(s) that contains the text of the license(s). There is also the case of a resource that is private or unpublished and is thus unlicensed; in this case do not register such a resource in the catalog in the first place since there is no point in making such a resource discoverable."
+          "$ref": "license.json"
         },
         "rights": {
           "type": "string",
-          "description": "A statement that concerns all rights not addressed by the license such as a copyright statement."
+          "description": "A statement that concerns all rights not addressed by the license such as a copyright statement.",
+          "options": {
+            "hidden": true
+          }
         }
+      },
+      "options": {
+        "titleHidden": true
       }
     },
     "links": {
+      "title": "Links",
       "type": "array",
       "items": {
+        "title": "Link",
         "type": "object",
         "required": [
           "href"
@@ -610,7 +473,12 @@
             "$ref": "#/definitions/baselink"
           }
         ]
-      }
+      },
+      "options": {
+        "collapsed": true,
+        "disable_collapse": false
+      },
+      "propertyOrder": 1007
     },
     "linkTemplates": {
       "type": "array",
@@ -639,6 +507,9 @@
             "$ref": "#/definitions/baselink"
           }
         ]
+      },
+      "options": {
+        "hidden": true
       }
     }
   },
@@ -647,33 +518,45 @@
       "type": "object",
       "properties": {
         "rel": {
-          "type": "string",
-          "description": "The type or semantics of the relation."
+          "title": "Relation",
+          "type": "string"
         },
         "type": {
           "type": "string",
-          "description": "A hint indicating what the media type of the result of dereferencing the link should be."
+          "title": "Media Type"
         },
         "hreflang": {
           "type": "string",
-          "description": "A hint indicating what the language of the result of dereferencing the link should be."
+          "description": "A hint indicating what the language of the result of dereferencing the link should be.",
+          "options": {
+            "hidden": true
+          }
         },
         "title": {
           "type": "string",
-          "description": "Used to label the destination of a link such that it can be used as a human-readable identifier."
+          "title": "Title"
         },
         "length": {
-          "type": "integer"
+          "type": "integer",
+          "options": {
+            "hidden": true
+          }
         },
         "created": {
           "type": "string",
           "description": "Date of creation of the resource pointed to by the link.",
-          "format": "date-time"
+          "format": "date-time",
+          "options": {
+            "hidden": true
+          }
         },
         "updated": {
           "type": "string",
           "description": "Most recent date on which the resource pointed to by the link was changed.",
-          "format": "date-time"
+          "format": "date-time",
+          "options": {
+            "hidden": true
+          }
         }
       }
     }

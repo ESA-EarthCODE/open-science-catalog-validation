@@ -1,9 +1,16 @@
 {
   "definitions": {
     "created": {
-      "title": "Creation Date and Time:",
+      "title": "Creation Date and Time",
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "pattern": "(\\+00:00|Z)$"
+    },
+    "updated": {
+      "title": "Last Update Time",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(\\+00:00|Z)$"
     },
     "osc:project": {
       "title": "Project",

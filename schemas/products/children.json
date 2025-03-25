@@ -15,6 +15,9 @@
         "created": {
           "$ref": "../osc.json#/definitions/created"
         },
+        "updated": {
+          "$ref": "../osc.json#/definitions/updated"
+        },
         "osc:type": {
           "type": "string",
           "enum": ["product"],
@@ -41,7 +44,8 @@
           "$ref": "../osc.json#/definitions/osc:experiment"
         },
         "themes": {
-          "$ref": "../themes.json"
+          "$ref": "../themes.json",
+          "propertyOrder": 50
         },
         "cf:parameter": {
           "type": "array",
