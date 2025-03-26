@@ -296,9 +296,8 @@
                   },
                   "proj:epsg": {
                     "title": "EPSG Code",
-                    "enum": [
-                      null
-                    ],
+                    "type": "null",
+                    "const": null,
                     "options": {
                       "hidden": true
                     }
