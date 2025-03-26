@@ -27,13 +27,10 @@
     "time": {
       "oneOf": [
         {
-          "enum": [
-            null
-          ]
+          "type": "null"
         },
         {
           "type": "object",
-          "nullable": true,
           "properties": {
             "date": {
               "type": "string",
@@ -80,9 +77,7 @@
     "geometry": {
       "oneOf": [
         {
-          "enum": [
-            null
-          ]
+          "type": "null"
         },
         {
           "oneOf": [

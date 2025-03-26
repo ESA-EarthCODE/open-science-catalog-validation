@@ -152,12 +152,8 @@
         "$ref": "catalog.json#/definitions/links"
       },
       "contactInstructions": {
-        "title": "Contact Instructions / Notes",
-        "type": "array",
-        "items": {
-          "title": "Note",
-          "type": "string"
-        }
+        "title": "Contact Instructions",
+        "type": "string"
       },
       "roles": {
         "$ref": "#/definitions/roles"
