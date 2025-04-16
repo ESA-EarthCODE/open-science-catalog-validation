@@ -107,7 +107,15 @@
                 "minItems": 4,
                 "maxItems": 4
               },
-              "minItems": 1
+              "minItems": 1,
+              "options": {
+                "map": {
+                  "projection": "EPSG:3857"
+                },
+                "drawtools": {
+                  "projection": "EPSG:4326"
+                }
+              }
             }
           }
         },
