@@ -52,7 +52,7 @@
     },
     "summaries": {
       "$comment": "Currently unused by OSC catalog",
-      "type": "array",
+      "type": "object",
       "options": {
         "hidden": true
       }
