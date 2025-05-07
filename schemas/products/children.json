@@ -9,7 +9,8 @@
       "required": [
         "osc:project",
         "osc:status",
-        "osc:type"
+        "osc:type",
+        "themes"
       ],
       "properties": {
         "created": {
