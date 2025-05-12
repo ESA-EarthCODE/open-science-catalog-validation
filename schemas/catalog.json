@@ -421,6 +421,9 @@
             "hidden": true
           }
         }
+      },
+      "options": {
+        "hidden": true
       }
     },
     "stac_link_parent": {
@@ -441,6 +444,9 @@
             "hidden": true
           }
         }
+      },
+      "options": {
+        "hidden": true
       }
     },
     "stac_link_parent_readonly": {
@@ -455,7 +461,10 @@
             }
           }
         }
-      ]
+      ],
+      "options": {
+        "hidden": true
+      }
     },
     "stac_link_child": {
       "title": "Child Link",
@@ -472,6 +481,9 @@
             "hidden": true
           }
         }
+      },
+      "options": {
+        "hidden": true
       }
     },
     "stac_link_item": {
@@ -489,6 +501,9 @@
             "hidden": true
           }
         }
+      },
+      "options": {
+        "hidden": true
       }
     },
     "stac_link_related": {
@@ -506,6 +521,9 @@
             "hidden": true
           }
         }
+      },
+      "options": {
+        "hidden": true
       }
     },
     "stac_link_self": {
@@ -527,6 +545,9 @@
           }
         }
 
+      },
+      "options": {
+        "hidden": true
       }
     },
     "via_links": {
