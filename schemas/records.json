@@ -279,6 +279,9 @@
       "items": {
         "title": "Conformance class",
         "type": "string"
+      },
+      "options": {
+        "hidden": true
       }
     },
     "properties": {
@@ -404,6 +407,9 @@
             "required": [
               "value"
             ]
+          },
+          "options": {
+            "hidden": true
           }
         },
         "formats": {
@@ -433,6 +439,9 @@
                 "type": "string"
               }
             }
+          },
+          "options": {
+            "hidden": true
           }
         },
         "contacts": {
