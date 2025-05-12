@@ -286,6 +286,7 @@
     },
     "properties": {
       "type": "object",
+      "propertyOrder": 1,
       "format": "categories",
       "required": [
         "title",
@@ -294,10 +295,16 @@
       ],
       "properties": {
         "created": {
-          "$ref": "./osc.json#/definitions/created"
+          "$ref": "./osc.json#/definitions/created",
+          "options": {
+            "hidden": true
+          }
         },
         "updated": {
-          "$ref": "./osc.json#/definitions/updated"
+          "$ref": "./osc.json#/definitions/updated",
+          "options": {
+            "hidden": true
+          }
         },
         "type": {
           "type": "string",
@@ -315,11 +322,11 @@
         },
         "title": {
           "$ref": "./catalog.json#/definitions/title",
-          "propertyOrder": 1
+          "propertyOrder": 4
         },
         "description": {
           "$ref": "./catalog.json#/definitions/description",
-          "propertyOrder": 2
+          "propertyOrder": 5
         },
         "keywords": {
           "$ref": "./collection.json#/definitions/keywords",
@@ -327,7 +334,7 @@
         },
         "themes": {
           "$ref": "./themes.json",
-          "propertyOrder": 50
+          "propertyOrder": 20
         },
         "language": {
           "description": "The language used for textual values in this record representation.",
@@ -445,7 +452,8 @@
           }
         },
         "contacts": {
-          "$ref": "contacts.json"
+          "$ref": "contacts.json",
+          "propertyOrder": 60
         },
         "license": {
           "$ref": "license.json"
@@ -483,11 +491,7 @@
           }
         ]
       },
-      "options": {
-        "collapsed": true,
-        "disable_collapse": false
-      },
-      "propertyOrder": 1007
+      "propertyOrder": 60
     },
     "linkTemplates": {
       "type": "array",

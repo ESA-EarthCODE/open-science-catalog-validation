@@ -30,13 +30,9 @@
         },
         "themes": {
           "$ref": "../themes.json",
-          "propertyOrder": 50
+          "propertyOrder": 20
         },
         "contacts": {
-          "options": {
-            "collapsed": true,
-            "disable_collapse": false
-          },
           "allOf": [
             {
               "$ref": "../contacts.json"
@@ -86,7 +82,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "propertyOrder": 60
         }
       }
     },

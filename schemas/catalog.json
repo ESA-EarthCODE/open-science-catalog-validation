@@ -26,14 +26,16 @@
       }
     },
     "title": {
-      "$ref": "#/definitions/title"
+      "$ref": "#/definitions/title",
+      "propertyOrder": 1
     },
     "description": {
-      "$ref": "#/definitions/description"
+      "$ref": "#/definitions/description",
+      "propertyOrder": 2
     },
     "links": {
       "$ref": "#/definitions/links",
-      "propertyOrder": 1007
+      "propertyOrder": 60
     }
   },
   "definitions": {

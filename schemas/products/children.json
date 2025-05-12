@@ -46,7 +46,7 @@
         },
         "themes": {
           "$ref": "../themes.json",
-          "propertyOrder": 50
+          "propertyOrder": 20
         },
         "cf:parameter": {
           "type": "array",

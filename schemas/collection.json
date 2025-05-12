@@ -28,10 +28,12 @@
       }
     },
     "title": {
-      "$ref": "catalog.json#/definitions/title"
+      "$ref": "catalog.json#/definitions/title",
+      "propertyOrder": 4
     },
     "description": {
-      "$ref": "catalog.json#/definitions/description"
+      "$ref": "catalog.json#/definitions/description",
+      "propertyOrder": 5
     },
     "keywords": {
       "$ref": "#/definitions/keywords",
@@ -41,7 +43,8 @@
       "$ref": "license.json"
     },
     "extent": {
-      "$ref": "#/definitions/extent"
+      "$ref": "#/definitions/extent",
+      "propertyOrder": 50
     },
     "providers": {
       "$comment": "Currently unused by OSC catalog",
@@ -65,7 +68,8 @@
       }
     },
     "links": {
-      "$ref": "catalog.json#/definitions/links"
+      "$ref": "catalog.json#/definitions/links",
+      "propertyOrder": 60
     }
   },
   "definitions": {

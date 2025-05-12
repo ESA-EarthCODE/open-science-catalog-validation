@@ -4,13 +4,19 @@
       "title": "Creation Date and Time",
       "type": "string",
       "format": "date-time",
-      "pattern": "(\\+00:00|Z)$"
+      "pattern": "(\\+00:00|Z)$",
+      "options": {
+        "hidden": true
+      }
     },
     "updated": {
       "title": "Last Update Time",
       "type": "string",
       "format": "date-time",
-      "pattern": "(\\+00:00|Z)$"
+      "pattern": "(\\+00:00|Z)$",
+      "options": {
+        "hidden": true
+      }
     },
     "osc:project": {
       "title": "Project",
@@ -42,7 +48,8 @@
         "type": "string",
         "format": "osc-mission",
         "minLength": 1
-      }
+      },
+      "propertyOrder": 40
     },
     "osc:variables": {
       "title": "Variables",
@@ -54,7 +61,8 @@
         "type": "string",
         "format": "osc-variable",
         "minLength": 1
-      }
+      },
+      "propertyOrder": 30
     },
     "osc:experiment": {
       "title": "Experiment",
