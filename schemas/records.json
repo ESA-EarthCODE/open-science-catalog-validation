@@ -284,6 +284,11 @@
     "properties": {
       "type": "object",
       "format": "categories",
+      "required": [
+        "title",
+        "description",
+        "license"
+      ],
       "properties": {
         "created": {
           "$ref": "./osc.json#/definitions/created"
