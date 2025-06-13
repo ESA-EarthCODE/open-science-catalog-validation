@@ -184,6 +184,50 @@
         }
       }
     },
+    "links_root_parent_child_2related_via_other": {
+      "properties": {
+        "links": {
+          "items": {
+            "oneOf": [
+              {
+                "title": "Other Link",
+                "properties": {
+                  "rel": {
+                    "not": {
+                      "enum": [
+                        "root",
+                        "parent",
+                        "child",
+                        "related",
+                        "via"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "$ref": "#/definitions/stac_link_root"
+              },
+              {
+                "$ref": "#/definitions/stac_link_parent"
+              },
+              {
+                "$ref": "#/definitions/stac_link_child"
+              },
+              {
+                "$ref": "#/definitions/stac_link_related"
+              },
+              {
+                "$ref": "#/definitions/web_link_related"
+              },
+              {
+                "$ref": "#/definitions/via_links"
+              }
+            ]
+          }
+        }
+      }
+    },
     "links_root_parent_child_related_via_input_environment_other": {
       "properties": {
         "links": {
@@ -492,10 +536,27 @@
       }
     },
     "stac_link_related": {
-      "title": "Related Link",
+      "title": "Related Link (STAC)",
       "properties": {
         "type": {
           "enum": ["application/json"],
+          "options": {
+            "hidden": true
+          }
+        },
+        "rel": {
+          "enum": ["related"],
+          "options": {
+            "hidden": true
+          }
+        }
+      }
+    },
+    "web_link_related": {
+      "title": "Related Link (Website)",
+      "properties": {
+        "type": {
+          "enum": ["text/html"],
           "options": {
             "hidden": true
           }
