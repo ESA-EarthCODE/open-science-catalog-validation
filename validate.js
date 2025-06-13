@@ -585,7 +585,7 @@ class ValidationRun {
       }
       else if (relativeRelTypes.includes(link.rel)) {
         this.t.truthy(!link.href.includes('://'), `Link with rel '${link.rel}' to '${link.href}' must be relative`)
-        return ;
+        return;
       }
     }
   }
