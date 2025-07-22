@@ -36,17 +36,19 @@
           "$ref": "../osc.json#/definitions/osc:region"
         },
         "osc:variables": {
-          "$ref": "../osc.json#/definitions/osc:variables"
+          "$ref": "../osc.json#/definitions/osc:variables",
+          "propertyOrder": 6
         },
         "osc:missions": {
-          "$ref": "../osc.json#/definitions/osc:missions"
+          "$ref": "../osc.json#/definitions/osc:missions",
+          "propertyOrder": 8
         },
         "osc:experiment": {
           "$ref": "../osc.json#/definitions/osc:experiment"
         },
         "themes": {
           "$ref": "../themes.json",
-          "propertyOrder": 50
+          "propertyOrder": 9
         },
         "cf:parameter": {
           "type": "array",
@@ -72,7 +74,8 @@
                 "type": "string"
               }
             }
-          }
+          },
+          "propertyOrder": 7
         }
       }
     },

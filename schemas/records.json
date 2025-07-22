@@ -315,11 +315,11 @@
         },
         "keywords": {
           "$ref": "./collection.json#/definitions/keywords",
-          "propertyOrder": 10
+          "propertyOrder": 11
         },
         "themes": {
           "$ref": "./themes.json",
-          "propertyOrder": 50
+          "propertyOrder": 9
         },
         "language": {
           "description": "The language used for textual values in this record representation.",
@@ -473,7 +473,7 @@
         "collapsed": true,
         "disable_collapse": false
       },
-      "propertyOrder": 1007
+      "propertyOrder": 10
     },
     "linkTemplates": {
       "type": "array",

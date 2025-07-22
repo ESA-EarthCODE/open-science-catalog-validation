@@ -35,13 +35,14 @@
     },
     "keywords": {
       "$ref": "#/definitions/keywords",
-      "propertyOrder": 10
+      "propertyOrder": 11
     },
     "license": {
       "$ref": "license.json"
     },
     "extent": {
-      "$ref": "#/definitions/extent"
+      "$ref": "#/definitions/extent",
+      "propertyOrder": 5
     },
     "providers": {
       "$comment": "Currently unused by OSC catalog",
@@ -113,7 +114,9 @@
                   "projection": "EPSG:3857"
                 },
                 "drawtools": {
-                  "projection": "EPSG:4326"
+                  "projection": "EPSG:4326",
+                  "showEditor": true,
+                  "importFeatures": true
                 }
               }
             }
@@ -139,7 +142,8 @@
                   "type": [
                     "string", "null"
                   ],
-                  "format": "date-time"
+                  "format": "date-time",
+                  "pattern": "(\\+00:00|Z)$"
                 },
                 "minItems": 2,
                 "maxItems": 2

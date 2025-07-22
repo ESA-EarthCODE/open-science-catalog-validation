@@ -14,7 +14,7 @@
       "properties": {
         "themes": {
           "$ref": "../themes.json",
-          "propertyOrder": 50
+          "propertyOrder": 9
         }
       }
     }

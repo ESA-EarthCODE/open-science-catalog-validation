@@ -3,6 +3,7 @@
   "type": "string",
   "enum": [
     "various",
+    "various open source",
     "proprietary",
     "0BSD",
     "AAL",

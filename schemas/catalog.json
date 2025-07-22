@@ -33,7 +33,7 @@
     },
     "links": {
       "$ref": "#/definitions/links",
-      "propertyOrder": 1007
+      "propertyOrder": 10
     }
   },
   "definitions": {
