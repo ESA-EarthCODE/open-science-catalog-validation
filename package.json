@@ -1,6 +1,6 @@
 {
   "name": "open-science-catalog-validation",
-  "version": "1.0.0-rc.14",
+  "version": "1.0.0-rc.15",
   "description": "Validates the metadata",
   "main": "validate.js",
   "author": "EOX",
