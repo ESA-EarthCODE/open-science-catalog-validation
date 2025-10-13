@@ -109,10 +109,13 @@ class CustomValidator extends BaseValidator {
 
   async afterLoading(data, report, config) {
     // Add UI schema to STAC extensions to validate against them additionally
-    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables|workflows|experiments)\/(catalog.json|.+)/);
+
+    // Match exactly '{type}/catalog.json' or '{type}/{id}/collection.json' and no other files
+    const match = report.id.match(/\/(eo-missions|products|projects|themes|variables|workflows|experiments)\/(catalog.json|(?:[^/]+\/)?collection.json)/);
     if (match) {
       const type = match[1];
       const level = match[2] === 'catalog.json' ? 'parent' : 'children';
+
       if (!Array.isArray(data.stac_extensions)) {
         data.stac_extensions = [];
       }
