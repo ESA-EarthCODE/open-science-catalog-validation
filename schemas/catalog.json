@@ -68,7 +68,10 @@
     "title": {
       "title": "Title",
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "options": {
+        "infoText": "A short descriptive one-line title for the item."
+      }
     },
     "description": {
       "title": "Description",
