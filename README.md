@@ -37,4 +37,7 @@ These schemas can also be used for e.g. automatically rendering an input form.
 To access the schemas in a bundled format (only internal `$ref`s), use the provided GH pages endpoint, e.g. https://esa-earthcode.github.io/open-science-catalog-validation/schemas/projects/children.json.
 
 # Development
+
 For development, copy some compatible folder structure into the root folder, then run `npm install` followed by a `npm test`.
+
+To update the license list, run `npm run update-licenses`

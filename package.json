@@ -14,6 +14,7 @@
   },
   "scripts": {
     "bundle": "node ./bundle.js",
-    "test": "stac-node-validator --config config.js"
+    "test": "stac-node-validator --config config.js",
+    "update-licenses": "node ./update-licenses.js"
   }
 }
