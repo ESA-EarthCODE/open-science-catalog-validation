@@ -157,7 +157,7 @@ class CustomValidator extends BaseValidator {
       const extents = data.extent?.spatial?.bbox;
       if (Array.isArray(extents)) {
         extents.forEach((bbox, index) => {
-          test.truthy(run.validateBoundingBox(bbox), `spatial extent at index ${index} must be a valid bounding box in EPSG:4326`);
+          test.truthy(run.validateBoundingBox(bbox), `spatial extent ${bbox} at index ${index} must be a valid bounding box in EPSG:4326`);
         });
       }
     }
@@ -626,7 +626,7 @@ class ValidationRun {
 
   requireValidGeoJsonGeometry(data, test) {
     if (data.bbox) {
-      test.truthy(this.validateBoundingBox(data.bbox), `bbox must be a valid bounding box in EPSG:4326`);
+      test.truthy(this.validateBoundingBox(data.bbox), `bbox ${data.bbox} must be a valid bounding box in EPSG:4326`);
     }
     if (data.geometry) {
       test.truthy(this.validateGeometry(data.geometry), `geometry must be a valid GeoJSON geometry with coordinates in EPSG:4326`);
@@ -656,6 +656,8 @@ class ValidationRun {
     if (south < -90 || south > 90) return false;
     if (north < -90 || north > 90) return false;
     if (south > north) return false;
+    // west > east is only valid when crossing the Antimeridian (west >= 0, east <= 0)
+    if (west > east && !(west >= 0 && east <= 0)) return false;
 
     return true;
   }
