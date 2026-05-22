@@ -1,6 +1,9 @@
 {
   "title": "License",
   "type": "string",
+  "options": {
+    "infoText": "License(s) of the data collection as SPDX License identifier, SPDX License expression, or other (see [stac-spec](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#license))."
+  },
   "enum": [
     "various",
     "various open source",
