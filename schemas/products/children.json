@@ -35,6 +35,10 @@
         "osc:region": {
           "$ref": "../osc.json#/definitions/osc:region"
         },
+        "scientific": {
+          "$ref": "../scientific.json",
+          "propertyOrder": 5
+        },
         "osc:variables": {
           "$ref": "../osc.json#/definitions/osc:variables",
           "propertyOrder": 6
