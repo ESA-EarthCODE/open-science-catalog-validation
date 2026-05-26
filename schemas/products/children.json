@@ -10,7 +10,8 @@
         "osc:project",
         "osc:status",
         "osc:type",
-        "themes"
+        "themes",
+        "sci:doi"
       ],
       "properties": {
         "created": {
@@ -35,8 +36,8 @@
         "osc:region": {
           "$ref": "../osc.json#/definitions/osc:region"
         },
-        "scientific": {
-          "$ref": "../scientific.json",
+        "sci:doi": {
+          "$ref": "../scientific.json#/definitions/fields/properties/sci:doi",
           "propertyOrder": 5
         },
         "osc:variables": {

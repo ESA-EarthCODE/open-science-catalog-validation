@@ -263,7 +263,7 @@ class ValidationRun {
 
   async validateProduct() {
     this.t.equal(this.data.type, "Collection", `type must be 'Collection'`);
-    this.hasExtensions(["osc"]);
+    this.hasExtensions(["osc", "sci"]);
     this.ensureIdIsFolderName();
 
     this.requireViaLink();
