@@ -153,6 +153,18 @@ class CustomValidator extends BaseValidator {
 
     const run = new ValidationRun(this, data, test, report);
 
+    if (data.isCollection()) {
+      const extents = data.extent?.spatial?.bbox;
+      if (Array.isArray(extents)) {
+        extents.forEach((bbox, index) => {
+          test.truthy(run.validateBoundingBox(bbox), `spatial extent ${bbox} at index ${index} must be a valid bounding box in EPSG:4326`);
+        });
+      }
+    }
+    else if (data.isItem()) {
+      run.requireValidGeoJsonGeometry(data, test);
+    }
+
     if (isProductUserContent) {
       run.validateUserContent();
     }
@@ -331,6 +343,8 @@ class ValidationRun {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
     this.ensureIdIsFolderName();
 
+    this.requireValidGeoJsonGeometry(this.data, this.t);
+
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
     await this.checkChildLinks("experiments", "record");
@@ -344,6 +358,8 @@ class ValidationRun {
   async validateExperiment() {
     this.t.equal(this.data.type, "Feature", `type must be 'Feature'`);
     this.ensureIdIsFolderName();
+
+    this.requireValidGeoJsonGeometry(this.data, this.t);
 
     await this.requireParentLink("../catalog.json");
     await this.requireRootLink("../../catalog.json");
@@ -606,6 +622,87 @@ class ValidationRun {
 
   requireViaLink() {
     this.hasLinkWithRel(this.data, "via");
+  }
+
+  requireValidGeoJsonGeometry(data, test) {
+    if (data.bbox) {
+      test.truthy(this.validateBoundingBox(data.bbox), `bbox ${data.bbox} must be a valid bounding box in EPSG:4326`);
+    }
+    if (data.geometry) {
+      test.truthy(this.validateGeometry(data.geometry), `geometry must be a valid GeoJSON geometry with coordinates in EPSG:4326`);
+    }
+  }
+
+  /**
+   * Validates whether a bounding box has valid EPSG:4326 coordinates in an order that follows the GeoJSON and STAC specification.
+   *
+   * @type {Array<number>} bbox - The bounding box to validate, expected in the form [west, south, east, north]
+   * @returns {boolean} - Returns true if the bounding box is valid, false otherwise.
+   */
+  validateBoundingBox(bbox) {
+    if (!Array.isArray(bbox) || (bbox.length !== 4 && bbox.length !== 6)) {
+      return false;
+    }
+    if (!bbox.every(v => typeof v === 'number' && isFinite(v))) {
+      return false;
+    }
+    const is3D = bbox.length === 6;
+    const [west, south, ...rest] = bbox;
+    const east = is3D ? rest[1] : rest[0];
+    const north = is3D ? rest[2] : rest[1];
+
+    if (west < -180 || west > 180) return false;
+    if (east < -180 || east > 180) return false;
+    if (south < -90 || south > 90) return false;
+    if (north < -90 || north > 90) return false;
+    if (south > north) return false;
+    // west > east is only valid when crossing the Antimeridian (west >= 0, east <= 0)
+    if (west > east && !(west >= 0 && east <= 0)) return false;
+
+    return true;
+  }
+
+  /**
+   * Validates whether a geometry object has valid EPSG:4326 coordinates in an order that follows the GeoJSON specification.
+   *
+   * @param {object} geometry - The geometry object to validate.
+   * @returns {boolean} - Returns true if the geometry is valid, false otherwise.
+   */
+  validateGeometry(geometry) {
+    if (geometry === null) {
+      return true;
+    }
+    if (!isObject(geometry) || typeof geometry.type !== 'string') {
+      return false;
+    }
+
+    switch (geometry.type) {
+      case 'Point':
+        return this.isValidCoordinate(geometry.coordinates);
+      case 'MultiPoint':
+      case 'LineString':
+        return this.isValidCoordinateArray(geometry.coordinates);
+      case 'MultiLineString':
+      case 'Polygon':
+        return Array.isArray(geometry.coordinates) && geometry.coordinates.every(this.isValidCoordinateArray.bind(this));
+      case 'MultiPolygon':
+        return Array.isArray(geometry.coordinates)
+          && geometry.coordinates.every(poly => Array.isArray(poly) && poly.every(this.isValidCoordinateArray.bind(this)));
+      case 'GeometryCollection':
+        return Array.isArray(geometry.geometries) && geometry.geometries.every(this.validateGeometry.bind(this));
+      default:
+        return false;
+    }
+  }
+
+  isValidCoordinate(pos) {
+    return Array.isArray(pos) && pos.length >= 2
+      && typeof pos[0] === 'number' && isFinite(pos[0]) && pos[0] >= -180 && pos[0] <= 180
+      && typeof pos[1] === 'number' && isFinite(pos[1]) && pos[1] >= -90 && pos[1] <= 90;
+  }
+
+  isValidCoordinateArray(arr) {
+    return Array.isArray(arr) && arr.every(this.isValidCoordinate.bind(this));
   }
 
 }
