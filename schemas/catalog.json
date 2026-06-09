@@ -77,13 +77,19 @@
       "title": "Description",
       "type": "string",
       "minLength": 1,
-      "format": "markdown"
+      "format": "markdown",
+      "options": {
+        "infoText": "Detailed multi-line description to fully explain the Catalog. [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation."
+      }
     },
     "links": {
       "title": "Links",
       "type": "array",
       "items": {
         "$ref": "#/definitions/link"
+      },
+      "options": {
+        "infoText": "A list of references to other documents."
       }
     },
     "link": {
