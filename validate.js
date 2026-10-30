@@ -221,7 +221,7 @@ class ValidationRun {
   async validateRoot() {
     this.t.equal(this.data.type, "Catalog", `type must be 'Catalog'`);
     this.t.equal(this.data.id, "osc", `id must be 'osc'`);
-    this.t.equal(this.data.title, "Open Science Catalog", `title must be 'Open Science Catalog'`);
+    this.t.equal(this.data.title, "Open Science Catalogue", `title must be 'Open Science Catalogue'`);
 
     // check parent and root
     await this.requireRootLink("./catalog.json");
