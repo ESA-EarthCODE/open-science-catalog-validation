@@ -263,7 +263,7 @@ class ValidationRun {
 
   async validateProduct() {
     this.t.equal(this.data.type, "Collection", `type must be 'Collection'`);
-    this.hasExtensions(["osc"]);
+    this.hasExtensions(["osc", "sci"]);
     this.ensureIdIsFolderName();
 
     this.requireViaLink();
@@ -367,11 +367,11 @@ class ValidationRun {
   hasExtensions(extensions) {
     if (Array.isArray(this.data.stac_extensions)) {
       for(let ext of extensions) {
-        this.t.truthy(this.data.stac_extensions.includes(EXTENSION_SCHEMES[ext]), "must implement extension: " + ext);
+        this.t.truthy(this.data.stac_extensions.includes(EXTENSION_SCHEMES[ext]), "must implement extension: " + (EXTENSION_SCHEMES[ext] || ext));
       }
     }
     else {
-      this.t.fail("must implement extensions: " + extensions.join(", "));
+      this.t.fail("must implement extensions: " + extensions.map(ext => (EXTENSION_SCHEMES[ext] || ext)).join(", "));
     }
   }
 

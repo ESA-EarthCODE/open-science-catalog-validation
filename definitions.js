@@ -1,7 +1,7 @@
 const EXTENSION_SCHEMES = {
   themes: 'https://stac-extensions.github.io/themes/v1.0.0/schema.json',
   contacts: 'https://stac-extensions.github.io/contacts/v0.1.1/schema.json',
-  // TODO add "Scientific Citation Extension Specification" for DOIs
+  sci: 'https://stac-extensions.github.io/scientific/v1.0.0/schema.json',
   osc: 'https://stac-extensions.github.io/osc/v1.0.0/schema.json'
 };
 
